@@ -34,75 +34,50 @@ class _quizcreatorState extends State<quizcreator> {
   TextEditingController _option3Controller = TextEditingController();
   TextEditingController _option4Controller = TextEditingController();
 
- // TextEditingController _questionMarksController = TextEditingController();
-
   int answertype = 0, opstionNumber = 1;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
        resizeToAvoidBottomInset: true,
-      //resizeToAvoidBottomPadding: false,
       body: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          //margin: EdgeInsets.all(1),
-         // padding: EdgeInsets.all(6),
           color: Colors.grey,
+
         child: SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),
           padding: EdgeInsets.symmetric(horizontal: 0, vertical: 45),
           child: Container(
             child: Column(
-             // mainAxisAlignment: MainAxisAlignment.center,
-              //  crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-              FlatButton(
-                color: Colors.white,
-                textColor: Colors.grey,
-                onPressed: () {
-                  FirebaseAuth.instance.signOut();
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => (user_role())));
-                },
-                child: Text(
-                  "Sign_out",
-                  style: TextStyle(fontSize: 10.0),
+
+                  Container(
+                height: 90,
+               margin: EdgeInsets.only(top:1 ,left: 10 ,right: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(100),
+                  color: Colors.white,
                 ),
-              ), //sign_out_btn
-              NewQuestionTypes(),
-              question(),
-              answertype == 1
-                  ? radio_btn_opsion_call()
-                  : answertype == 2
-                      ? trueFalse_btn_opsion_call()
-                      // : answertype == 3
-                      //     ? chack_btn_opsion_call()
-                      //     : answertype == 4
-                      //         ? text_btn_opsion_call()
-                              : SizedBox(),
-              // Container(
-              //   alignment: Alignment.topCenter,
-              //   width: MediaQuery.of(context).size.width * .20,
-              //   child: TextFormField(
-              //     maxLength: 1,
-              //     keyboardType: TextInputType.number,
-              //     textAlign: TextAlign.center,
-              //     decoration: InputDecoration(
-              //         counter: SizedBox(),
-              //         filled: true,
-              //         fillColor: Colors.white,
-              //         border: InputBorder.none,
-              //         hintText: ' Marks  ',
-              //         hintStyle: TextStyle( fontSize: 12),
-              //         contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10)),
-              //     onChanged: (marks) {
-              //       setState(() {});
-              //       // print(questionmarks);
-              //     },
-              //     controller: _questionMarksController,
-              //   ),
-              // ),
+                child: Center(
+                  child: Text(
+                    "CREATE YOUR QUIZ",
+                    style: TextStyle(fontSize: 24.0 ,fontWeight: FontWeight.bold , color: Colors.amber),
+                  ),
+                ),
+              ), //Text Create Text
+
+                  NewQuestionTypes(),
+
+                  question(),
+
+                  answertype == 1
+                      ? radio_Buttonoption()
+                        : answertype == 2
+                            ? tru_false_Buttonoption()
+                             : answertype == 3
+                               ? Short_Question_Buttonoption()
+                                : SizedBox(),
 
                   GestureDetector(
                     child: Container(
@@ -158,35 +133,30 @@ class _quizcreatorState extends State<quizcreator> {
                       });
                     },
                   ), //for Add question
-              Container(
-                height: 80,
-                width: 80,
-                //padding: EdgeInsets.all(5.0),
-                margin:EdgeInsets.only(top: 20) ,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(width: 1, color: Colors.blueAccent),
-                  borderRadius: BorderRadius.circular(60),
-                ),
-                child: GestureDetector(
-                 // color: Colors.white,
-                  onTap: () {
-                    setState(() {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => Teacher_main_function()));
-                    });
-
-                  },
+                  GestureDetector(
+                child: Container(
+                  height: 80,
+                  width: 80,
+                  margin:EdgeInsets.only(top: 20) ,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(width: 1, color: Colors.blueAccent),
+                    borderRadius: BorderRadius.circular(60),
+                  ),
                   child: Center(
                     child: Text(
                       "Finish",
                       style: TextStyle(fontSize: 16.0 , fontWeight: FontWeight.bold, color: Colors.brown,),
                     ),
                   ),
-
                 ),
+                    onTap: (){
+                  setState(() {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Teacher_main_function()));     });
+                    },
               ), //for finish question
 
             ]),
@@ -198,28 +168,28 @@ class _quizcreatorState extends State<quizcreator> {
 
   Widget question() {
     return Container(
+      height: 90,
+      margin: EdgeInsets.only(left: 10 ,right: 10),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(100),
         color: Colors.white,
       ),
-      padding: EdgeInsets.all(9),
-      margin: EdgeInsets.all(9),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'Q ' + quesion_number.toString() + ': ',
+            '\t\t Q ' + quesion_number.toString() + ':\t\t',
             style: TextStyle(
                 color: Colors.grey,
-                fontSize: 18,
-                fontWeight: FontWeight.w900),
+                fontSize: 24,
+                fontWeight: FontWeight.bold),
           ),
           Expanded(
             child: TextField(
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Enter Your Question',
-                hintStyle: TextStyle(fontSize: 14.0, color: Colors.grey),
+                hintStyle: TextStyle(fontSize: 14.0, color: Colors.amber),
               ),
               controller: _questionController,
             ),
@@ -236,351 +206,268 @@ class _quizcreatorState extends State<quizcreator> {
     );
   }
 
-  Widget radio_btn_opsion(TextEditingController controller, int value) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-      ),
-      padding: EdgeInsets.all(5),
-      margin: EdgeInsets.all(5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          RadioButtonoption(value),
-          Expanded(
-            child: TextField(
-              controller: controller,
+  Widget radio_Buttonoption(){
+    return Column(
+      children: <Widget>[
+        Container(
+          height: 60,
+          width: 370,
+          margin: EdgeInsets.only(top: 7 ,left: 10 ,right: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            color: Colors.white,
+          ),
+
+          child: ListTile(
+            title:  TextField(
+                      decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Enter Your Option',
+                      hintStyle: TextStyle(fontSize: 14.0, color: Colors.amber),
+                    ),
+              controller: _option1Controller,
+                  ),
+            leading: Radio<int>(
+              value: 1,
+              groupValue: courectanswe,
+              onChanged: (int value) {
+                setState(() {
+                  courectanswe=value;
+                });
+              },
+            ),
+          ),
+        ),
+        Container(
+          height: 60,
+          width: 370,
+          margin: EdgeInsets.only(top: 1 ,left: 10 ,right: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            color: Colors.white,
+          ),
+          child: ListTile(
+            title: TextField(
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Enter Your Option',
-                hintStyle: TextStyle(fontSize: 14.0, color: Colors.grey),
+                hintStyle: TextStyle(fontSize: 14.0, color: Colors.amber),
               ),
+              controller: _option2Controller,
+            ),
+            leading: Radio<int>(
+              value: 2,
+              groupValue: courectanswe,
+              onChanged: (int value) {
+                setState(() {
+                  courectanswe=value;
+                });
+              },
             ),
           ),
-        ],
-      ),
-    );
-  }
-  Widget radio_btn_opsion_call() {
-    return Container(
-      child: Column(
-        children: [
-          radio_btn_opsion(_option1Controller, 1),
-          radio_btn_opsion(_option2Controller, 2),
-          radio_btn_opsion(_option3Controller, 3),
-          radio_btn_opsion(_option4Controller, 4),
-        ],
-      ),
-    );
-  }
-  Widget RadioButtonoption(value) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          courectanswe = value;
-        });
-      },
-      child: Container(
-          height: 15,
-          width: 15,
-          margin: EdgeInsets.all(7),
-          padding: EdgeInsets.all(2),
+        ),
+        Container(
+          height: 60,
+          width: 370,
+          margin: EdgeInsets.only(top:1 ,left: 10 ,right: 10),
           decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(width: 1, color: Colors.lightGreen)),
-          child: Container(
-              decoration: BoxDecoration(
-                  color:
-                      value == courectanswe ? Colors.lightGreen : Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                      width: 1,
-                      color: courectanswe == value
-                          ? Colors.lightGreen
-                          : Colors.white)))),
-    );
-  }
-
-  // Widget chack_btn_opsion(TextEditingController controller, int box) {
-  //   return Container(
-  //     decoration: BoxDecoration(
-  //       borderRadius: BorderRadius.circular(10),
-  //       color: Colors.white,
-  //     ),
-  //     padding: EdgeInsets.all(5),
-  //     margin: EdgeInsets.all(5),
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //       children: [
-  //         chackBox_ButtonOption(box),
-  //         Expanded(
-  //           child: TextField(
-  //             controller: controller,
-  //             decoration: InputDecoration(
-  //               border: InputBorder.none,
-  //               hintText: 'Enter Your opstion',
-  //               hintStyle: TextStyle(fontSize: 14.0, color: Colors.grey),
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-  // Widget chack_btn_opsion_call() {
-  //   return Container(
-  //     child: Column(
-  //       children: [
-  //         chack_btn_opsion(_option1Controller, 1),
-  //         chack_btn_opsion(_option2Controller, 2),
-  //         chack_btn_opsion(_option3Controller, 3),
-  //         chack_btn_opsion(_option4Controller, 4),
-  //       ],
-  //     ),
-  //   );
-  // }
-  // Widget chackBox_ButtonOption(value) {
-  //   return GestureDetector(
-  //     onTap: () {
-  //       setState(() {
-  //         courectanswe = value;
-  //       });
-  //     },
-  //     child: Container(
-  //       height: 15,
-  //       width: 15,
-  //       margin: EdgeInsets.all(7),
-  //       padding: EdgeInsets.all(2),
-  //       decoration: BoxDecoration(
-  //           shape: BoxShape.rectangle,
-  //           border: Border.all(width: 1, color: Colors.lightGreen)),
-  //       child: Container(
-  //         decoration: BoxDecoration(
-  //             color: value == courectanswe ? Colors.lightGreen : Colors.white,
-  //             shape: BoxShape.rectangle,
-  //             border: Border.all(
-  //                 width: 1,
-  //                 color: value == courectanswe
-  //                     ? Colors.lightGreen
-  //                     : Colors.white)),
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  Widget trueFalse_btn_opsion_call() {
-    return Container(
-      child: Column(
-        children: [
-          trueFalse_btn_opsion(true, 1),
-          trueFalse_btn_opsion(false, 2),
-        ],
-      ),
-    );
-  }
-  Widget trueFalse_btn_opsion(bool val, int value) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-      ),
-      padding: EdgeInsets.all(9),
-      margin: EdgeInsets.all(9),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          True_False_RadioButtonoption(value),
-
-          // controller = prefs.get("houseNumber");
-          Text(
-            value ==1 ? 'True' : 'False',
-            style: TextStyle(color: Colors.grey),
-
+            borderRadius: BorderRadius.circular(30),
+            color: Colors.white,
           ),
-        ],
-      ),
-    );
-  }
-  Widget True_False_RadioButtonoption(value) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          value==1 ? stringAnswer="true":stringAnswer="false";
-          courectanswe = value;
-        });
-      },
-      child: Container(
-          height: 15,
-          width: 15,
-          margin: EdgeInsets.all(7),
-          padding: EdgeInsets.all(2),
-          decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(width: 1, color: Colors.lightGreen)),
-          child: Container(
-              decoration: BoxDecoration(
-                  color:
-                  value == courectanswe ? Colors.lightGreen : Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                      width: 1,
-                      color: courectanswe == value
-                          ? Colors.lightGreen
-                          : Colors.white)))),
-    );
-  }
-  //
-  // Widget text_btn_opsion_call() {
-  //   return Container(
-  //     child: Column(
-  //       children: [
-  //         text_btn_opsion(),
-  //       ],
-  //     ),
-  //   );
-  // }
-  //
-  // Widget text_btn_opsion() {
-  //   return Container(
-  //     decoration: BoxDecoration(
-  //       borderRadius: BorderRadius.circular(10),
-  //       color: Colors.white,
-  //     ),
-  //     padding: EdgeInsets.all(5),
-  //     margin: EdgeInsets.all(5),
-  //     child: TextField(
-  //      //  new controller: ,
-  //       decoration: InputDecoration(
-  //         border: InputBorder.none,
-  //         hintText: '\t\t\t Enter Your Answer',
-  //         hintStyle: TextStyle(fontSize: 14.0, color: Colors.grey),
-  //       ),
-  //       onChanged: (val) {
-  //         setState(() {
-  //             stringAnswer = val;
-  //         });
-  //       },
-  //     ),
-  //   );
-  // }
-
-  Widget NewQuestionTypes(){
-    return Column(
-      children: <Widget>[
-        ListTile(
-          title: const Text('MCQs'),
-          leading: Radio<int>(
-            value: 1,
-            groupValue: answertype,
-            onChanged: (int value) {
-              setState(() {
-                answertype = value;
-              });
-            },
+          child: ListTile(
+            title: TextField(
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Enter Your Option',
+                hintStyle: TextStyle(fontSize: 14.0, color: Colors.amber),
+              ),
+              controller: _option3Controller,
+            ),
+            leading: Radio<int>(
+              value: 3,
+              groupValue: courectanswe,
+              onChanged: (int value) {
+                setState(() {
+                  courectanswe=value;
+                });
+              },
+            ),
           ),
         ),
-        ListTile(
-          title: const Text('True/False'),
-          leading: Radio<int>(
-            value: 2,
-            groupValue: answertype,
-            onChanged: (int value) {
-              setState(() {
-                answertype = value;
-              });
-            },
+        Container(
+          height: 60,
+          width: 370,
+          margin: EdgeInsets.only(top:1 ,left: 10 ,right: 10 ,bottom: 19),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            color: Colors.white,
           ),
-        ),
-        ListTile(
-          title: const Text('Short Question'),
-          leading: Radio<int>(
-            value: 3,
-            groupValue: answertype,
-            onChanged: (int value) {
-              setState(() {
-                answertype = value;
-              });
-            },
+          child: ListTile(
+            title: TextField(
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Enter Your Option',
+                hintStyle: TextStyle(fontSize: 14.0, color: Colors.amber),
+              ),
+                controller: _option4Controller,
+            ),
+            leading: Radio<int>(
+              value: 4,
+              groupValue: courectanswe,
+              onChanged: (int value) {
+                setState(() {
+                  courectanswe=value;
+                });
+              },
+            ),
           ),
         ),
       ],
     );
   }
-
-  Widget question_Type() {
+  Widget tru_false_Buttonoption(){
+    return Column(
+      children: <Widget>[
+        Container(
+          height: 60,
+          width: 370,
+          margin: EdgeInsets.only(top:7 ,left: 10 ,right: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            color: Colors.white,
+          ),
+          child: ListTile(
+            title: const Text('True',
+              style: TextStyle(color: Colors.amber ,),
+            ),
+            leading: Radio<int>(
+              value: 1,
+              groupValue: courectanswe,
+              onChanged: (int value) {
+                setState(() {
+                  courectanswe=value;
+                  stringAnswer="True";
+                  courectanswe==1?_option1Controller.text='True':SizedBox();
+                  courectanswe==1?_option2Controller.text='False':SizedBox();
+                });
+              },
+            ),
+          ),
+        ),
+        Container(
+          height: 60,
+          width: 370,
+          margin: EdgeInsets.only(top:1 ,left: 10 ,right: 10 ,bottom: 19),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            color: Colors.white,
+          ),
+          child: ListTile(
+            title: const Text('False',
+              style: TextStyle(color: Colors.amber),
+            ),
+            leading: Radio<int>(
+              value: 2,
+              groupValue: courectanswe,
+              onChanged: (int value) {
+                setState(() {
+                  courectanswe=value;
+                  stringAnswer="False";
+                  courectanswe==2?_option2Controller.text='False':SizedBox();
+                  courectanswe==2?_option1Controller.text='True':SizedBox();
+                });
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+  Widget Short_Question_Buttonoption(){
     return Container(
+      height: 60,
+      width: 370,
+      margin: EdgeInsets.only(top:1 ,left: 10 ,right: 10 , bottom: 19),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        color: Colors.white,
+      ),
       child: Column(
-       // mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-           // mainAxisAlignment: MainAxisAlignment.center,
-            //crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: radio_Button_For_Question_Type('MCQ', 1),
+        children: <Widget>[
+          ListTile(
+            title:  TextField(
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Enter Your Answer',
+                hintStyle: TextStyle(fontSize: 14.0, color: Colors.amber),
               ),
-              Expanded(
-                child: radio_Button_For_Question_Type('true_False', 2),
-
-              ),
-            ],
+              controller: _option1Controller,
+            ),
+            leading: Radio<int>(
+              value: 1,
+              groupValue: courectanswe,
+              onChanged: (int value) {
+                setState(() {
+                  courectanswe=value;
+                  stringAnswer=_option1Controller.text;
+                });
+              },
+            ),
           ),
-          SizedBox(
-            height: 10,
-          ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //   children: [
-          //     Expanded(
-          //       child: radio_Button_For_Question_Type('MCQ', 3),
-          //     ),
-          //     Expanded(
-          //       child: radio_Button_For_Question_Type('Short Question', 4),
-          //     ),
-          //   ],
-          // ),
         ],
       ),
     );
   }
-  Widget radio_Button_For_Question_Type(String value, int type) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          answertype = type;
-        });
-      },
-      child: Container(
-        margin: EdgeInsets.all(7),
-        child: Row(
-          children: [
-            Container(
-              height: 15,
-              width: 15,
-              margin: EdgeInsets.only(right: 9),
-              padding: EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(width: 1, color: Colors.white)),
-              child: answertype == type
-                  ? Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(width: 1, color: Colors.white)),
-                    )
-                  : SizedBox(),
+  Widget NewQuestionTypes(){
+    return Container(
+      margin: EdgeInsets.only(top:1 ,left: 10 ,right: 10 , bottom: 1),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(50),
+        color: Colors.white,
+      ),
+      child: Column(
+        children: <Widget>[
+          ListTile(
+            title: const Text('MCQs'),
+            leading: Radio<int>(
+              value: 1,
+              groupValue: answertype,
+              onChanged: (int value) {
+                setState(() {
+                  answertype = value;
+                });
+              },
             ),
-            Text(
-              value,
-              style: TextStyle(color: Colors.white),
+          ),
+          ListTile(
+            title: const Text('True/False'),
+            leading: Radio<int>(
+              value: 2,
+              groupValue: answertype,
+              onChanged: (int value) {
+                setState(() {
+                  answertype = value;
+                });
+              },
             ),
-          ],
-        ),
+          ),
+          ListTile(
+            title: const Text('Short Question'),
+            leading: Radio<int>(
+              value: 3,
+              groupValue: answertype,
+              onChanged: (int value) {
+                setState(() {
+                  answertype = value;
+                });
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
+
 
   void quiz_maker_fairbase() async{
 
@@ -596,12 +483,7 @@ class _quizcreatorState extends State<quizcreator> {
       'option3': _option3Controller.text,
       'option4': _option4Controller.text,
 
-      'correct_option': answertype < 2 ?  courectanswe.toString():  stringAnswer,
-
-//      'questionmarks': _questionMarksController.text,
-
-    //  'totalmarks': totalmarks,
-      //"anwerType": answertype,[][""
+      'correct_option': answertype == 1 ?  courectanswe.toString():  stringAnswer,
 
       'quiznumber': widget.quizName,
       //'date': DateTime.now().millisecondsSinceEpoch
@@ -609,8 +491,6 @@ class _quizcreatorState extends State<quizcreator> {
       setState(() {
         courectanswe = 0;
         stringAnswer = 'NULL';
-
-        //_questionMarksController.clear();
 
         _questionController.clear();
         _option1Controller.clear();
