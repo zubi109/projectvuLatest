@@ -3,31 +3,30 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:projectvu/utilities/user.dart';
+import 'package:projectvu/utilities/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'attempt_quize.dart';
+import 'editor_view_quize.dart';
 
-class Std extends StatefulWidget {
-  String quizName;
+
+class Teacherview_subject_view extends StatefulWidget {
+
   String speciality;
-   //String user_name;
-  View_quiz(String quizNamee, String tspeciality , ) {
-    this.quizName = quizNamee;
-    this.speciality = tspeciality;
-    //this.quizName = current_user_name;
+  Teacherview_subject_view(String tspeciality) {
+
+    this.speciality=tspeciality;
   }
 
   @override
   _stdState createState() => _stdState();
 }
 
-class _stdState extends State<Std> {
+class _stdState extends State<Teacherview_subject_view> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: (Container(
-          margin: EdgeInsets.only(top: 40),
+          child: (Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           color: Colors.black38,
@@ -35,13 +34,13 @@ class _stdState extends State<Std> {
             FlatButton(
               color: Colors.white60,
               splashColor: Colors.white,
-              onPressed: () async {
+              onPressed: () async{
                 setState(() {
                   FirebaseAuth.instance.signOut();
                   Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => (user_role())));
                 });
-                SharedPreferences prefs = await SharedPreferences.getInstance();
+                SharedPreferences prefs=await SharedPreferences.getInstance();
                 prefs.setBool("student", false);
               },
               child: Text(
@@ -59,52 +58,50 @@ class _stdState extends State<Std> {
                   style: TextStyle(
                     color: Colors.brown,
                   ),
-                )), //quotation for student
+                )),
 
-            boddy(), // for
+            boddy(),
+
 
             //***********************************************************************************
             // ******************************Take Quize********************************************************
             //************************************************************************************
             StreamBuilder(
-                stream:
-                    FirebaseFirestore.instance.collection("Quiz").snapshots(),
+                stream: FirebaseFirestore.instance
+                    .collection("Quiz").where("teacherid",isEqualTo: widget.speciality)
+
+                    .snapshots(),
                 builder: (BuildContext context, snapshot) {
+
                   QuerySnapshot snapData = snapshot.data;
-                  if (!snapshot.hasData) {
-                    return CircularProgressIndicator();
-                  } else {
-                    return Expanded(
-                      child: new ListView.builder(
-                          //   physics: NeverScrollableScrollPhysics(),
-                          physics: BouncingScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: snapData.size,
-                          itemBuilder: (BuildContext context, int index) {
+                  // QuerySnapshot snapData = snapshot.data;
+                  if(!snapshot.hasData)
+                  {
+                    return  CircularProgressIndicator();
+                  }else {
+                    return new ListView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: snapData.size,
+                        itemBuilder: (BuildContext context, int index) {
+
 //int plusindex=index+1;
-                            return FlatButton(
-                              color: Colors.white,
-                              splashColor: Colors.white,
-                              onPressed: () {
-                                setState(() {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => (AttemptQuize(
-                                              snapData.docs[index]['tilte'],
-                                              snapData.docs[index]['quizId'],
-                                             // snapData.docs[index]['username']
-                                          ))));
-                                });
-                              },
-                              child: Text(
-                                snapData.docs[index]['tilte'],
-                                style: TextStyle(
-                                    fontSize: 20.0, color: Colors.brown),
-                              ),
-                            );
-                          }),
-                    );
+                          return  FlatButton(
+                            color: Colors.white,
+                            splashColor: Colors.white,
+                            onPressed: () {
+                              setState(() {
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) =>
+                                     (Editor_Quize_View(snapData.docs[index]['tilte'],snapData.docs[index]['quizId']))));
+                              });
+                            },
+                            child: Text(
+                              snapData.docs[index]['tilte'],
+                              style: TextStyle(fontSize: 20.0, color: Colors.brown),
+                            ),
+                          );
+                        });
                   }
                 }),
           ]),
@@ -133,18 +130,15 @@ class _stdState extends State<Std> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Text("Name"),
-                    Text(""),
+
+//                    Text(UserD.userData.name),
                     Text("Email:"),
-                    Text(""),
-                    //UserD.userData.email
+//                    Text(UserD.userData.email),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Text("Program:"),
-                    //Text(widget.user_name),
-                    //Text(UserD.userData.program),
                     Text("Time"),
                     //Text(UserD.userData.),
                   ],

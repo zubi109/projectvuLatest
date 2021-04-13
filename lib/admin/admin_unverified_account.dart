@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:projectvu/login.dart';
+import 'package:projectvu/utilities/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class AdminUnverifiedAccountList extends StatefulWidget {
@@ -17,8 +18,8 @@ class _AdminUnverifiedAccountListState extends State<AdminUnverifiedAccountList>
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      resizeToAvoidBottomPadding: false,
-      backgroundColor: Colors.blueAccent,
+     // resizeToAvoidBottomPadding: false,
+      backgroundColor: Colors.grey,
 
       body: Container(
         height: MediaQuery.of(context).size.height,
@@ -65,17 +66,19 @@ class _AdminUnverifiedAccountListState extends State<AdminUnverifiedAccountList>
                     style: TextStyle(fontSize: 10.0, color: selectedRole==2?Colors.white:Colors.black),),
                 ),  // Student list selectedRole = 2
                 FlatButton(
-                  color:selectedRole==1||selectedRole==2? Colors.lightGreen: Colors.white,
+                  color:Colors.white60,
                   textColor: Colors.black,
                   disabledColor: Colors.grey,
                   disabledTextColor: Colors.black,
                   splashColor: Colors.white,
-                  onPressed: () {
+                  onPressed: () async{
                     setState(() {
                       FirebaseAuth.instance.signOut();
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>(LogInClass())));
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>(user_role())));
 
                     });
+                    SharedPreferences prefs=await SharedPreferences.getInstance();
+                    prefs.setBool("admin", false);
                   },
                   child: Text("Sign_out",
                     style: TextStyle(fontSize: 10.0, color: selectedRole==1||selectedRole==2?Colors.white:Colors.black),),
