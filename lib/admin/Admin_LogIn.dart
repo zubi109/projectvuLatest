@@ -128,8 +128,8 @@ class _LogIn_Class_for_AdminState extends State<LogIn_Class_for_Admin> {
           print(userData['email']);
           print(userData[date.toString()]);
 
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => admin_home()));
+            // Navigator.pushReplacement(
+            //     context, MaterialPageRoute(builder: (context) => admin_home()));
 
         });
       }

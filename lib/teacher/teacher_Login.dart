@@ -60,7 +60,7 @@ var userid , useremail , username;
 
       backgroundColor: Colors.grey,
       body: SingleChildScrollView(
-
+        physics: AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.symmetric(horizontal: 0,vertical: 0),
 
         child: Container(

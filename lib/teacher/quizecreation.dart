@@ -10,8 +10,8 @@ import 'package:projectvu/utilities/user_model.dart';
 import 'package:flutter/material.dart';
 
 class quizcreator extends StatefulWidget {
-  String quizName;
-  quizcreator(String quizNamee) {
+  String quizName ;
+  quizcreator(String quizNamee, ) {
     this.quizName = quizNamee;
   }
   @override
@@ -64,7 +64,7 @@ setState(() {
                 ),
                 child: Center(
                   child: Text(
-                    "CREATE YOUR QUIZ",
+                    "CREATE YOUR QUESTIONS",
                     style: TextStyle(fontSize: 24.0 ,fontWeight: FontWeight.bold , color: Colors.amber),
                   ),
                 ),
@@ -93,7 +93,7 @@ setState(() {
                       ),
                       child: Center(
                         child: Text(
-                          "Add",
+                          "Next",
                           style: TextStyle(fontSize: 20.0 , fontWeight: FontWeight.bold, color: Colors.brown,),
                         ),
                       ),
@@ -508,6 +508,9 @@ setState(() {
       child: Column(
         children: <Widget>[
           ListTile(
+            title: const Text('Question Type'),
+          ),
+          ListTile(
             title: const Text('MCQs'),
             leading: Radio<int>(
               value: 1,
@@ -518,7 +521,7 @@ setState(() {
                 });
               },
             ),
-          ),
+          ), //MCQS
           ListTile(
             title: const Text('True/False'),
             leading: Radio<int>(
@@ -530,7 +533,7 @@ setState(() {
                 });
               },
             ),
-          ),
+          ),    //True & False
           ListTile(
             title: const Text('Short Question'),
             leading: Radio<int>(
@@ -542,7 +545,7 @@ setState(() {
                 });
               },
             ),
-          ),
+          ),  //Short Question
         ],
       ),
     );
