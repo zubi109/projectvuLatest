@@ -5,7 +5,7 @@ import 'package:flutter/painting.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:projectvu/teacher/teacher_home_page1.dart';
+import 'package:projectvu/teacher/teacher_home.dart';
 import 'package:projectvu/utilities/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -148,7 +148,7 @@ var userid , useremail , username;
    //       print(userData[date.toString()]);
 
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => Teacher_main_function()));
+              context, MaterialPageRoute(builder: (context) => TeacherHome()));
 
         });
       }

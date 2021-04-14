@@ -1,7 +1,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:projectvu/teacher/quizecreation.dart';
+import 'package:projectvu/teacher/CreateQuestion.dart';
 import 'package:projectvu/utilities/quize_Data_Base.dart';
 import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,8 +30,8 @@ class _Create_subjectState extends State<Create_subject> {
       }).then((value) {
         setState(() {
           _isLoding = false;
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => quizcreator(quizId)));
+          // Navigator.pushReplacement(context,
+          //     MaterialPageRoute(builder: (context) => CreateQuestion(quizId)));
         });
       });
     }
@@ -81,11 +81,12 @@ class _Create_subjectState extends State<Create_subject> {
                   InkWell(
                     onTap: () {
                       createQuizeline();
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  quizcreator(_subjectController.text)));
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) =>
+                      //             CreateQuestion(_subjectController.text)
+                      //     ));
                     },
                     child: Container(
                       height: 106,

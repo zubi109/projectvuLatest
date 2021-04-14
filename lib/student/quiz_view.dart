@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:projectvu/teacher/quizecreation.dart';
-import 'package:projectvu/teacher/teacher_home_page1.dart';
+import 'package:projectvu/teacher/CreateQuestion.dart';
+import 'package:projectvu/teacher/teacher_home.dart';
 import 'package:projectvu/utilities/user.dart';
 import 'package:projectvu/utilities/user_model.dart';
 
@@ -50,7 +50,7 @@ class _View_quizState extends State<View_quiz> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => Teacher_main_function()));
+                            builder: (context) => TeacherHome()));
                   });
                 },
                 child: Text(

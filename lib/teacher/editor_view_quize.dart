@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:projectvu/student/student_home_page.dart';
-import 'package:projectvu/teacher/teacher_home_page1.dart';
+import 'package:projectvu/teacher/teacher_home.dart';
 import 'package:projectvu/utilities/user.dart';
 
 
@@ -127,7 +127,7 @@ class _Editor_Quize_ViewState extends State<Editor_Quize_View> {
             onPressed: () {
               setState(() {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => (Teacher_main_function())));
+                    MaterialPageRoute(builder: (context) => (TeacherHome())));
               });
             },
             child: Text(

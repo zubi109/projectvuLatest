@@ -5,11 +5,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:projectvu/student/student_home_page.dart';
+import 'package:projectvu/utilities/UserData.dart';
+import 'package:projectvu/utilities/UserRole.dart';
 import 'package:projectvu/utilities/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'Authentication/Login.dart';
 import 'admin/admin_unverified_account.dart';
-import 'teacher/teacher_home_page1.dart';
+import 'teacher/teacher_home.dart';
 import 'utilities/user_model.dart';
 
 class splashScreenclass extends StatefulWidget {
@@ -58,31 +61,32 @@ class _splashScreenState extends State<splashScreenclass> {
 
   screen_director() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
-    if (_prefs.getBool("student") == true) {
-
+    var role = _prefs.getString(UserData.role.toString().split('.').last);
+    if (role == UserRole.Student.toString().split('.').last) {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) =>Std()));
-    } else if (_prefs.getBool("admin") == true) {
+    } else if (role == UserRole.Admin.toString().split('.').last) {
 
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) => AdminUnverifiedAccountList()));
 
-      } else if (_prefs.getBool("teacher") == true)
+      } else if (role == UserRole.Editor.toString().split('.').last)
         {
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: (context) => Teacher_main_function()));
-        }else
+                  builder: (context) => TeacherHome()));
+        }
+    else
           {
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => user_role()));
+                    builder: (context) => Login()));
           }
 
 

@@ -4,22 +4,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:projectvu/teacher/teacher_home_page1.dart';
+import 'package:projectvu/models/quiz.dart';
+import 'package:projectvu/teacher/teacher_home.dart';
 import 'package:projectvu/utilities/user.dart';
 import 'package:projectvu/utilities/user_model.dart';
 import 'package:flutter/material.dart';
 
-class quizcreator extends StatefulWidget {
-  String quizName ;
-  quizcreator(String quizNamee, ) {
-    this.quizName = quizNamee;
+class CreateQuestion extends StatefulWidget {
+  Quiz quiz ;
+  CreateQuestion( Quiz quiz) {
+    this.quiz = quiz;
   }
   @override
-  _quizcreatorState createState() => _quizcreatorState();
+  _CreateQuestionState createState() => _CreateQuestionState(quiz);
 }
 
-class _quizcreatorState extends State<quizcreator> {
-
+class _CreateQuestionState extends State<CreateQuestion> {
+  Quiz newQuiz;
+  _CreateQuestionState(Quiz quiz){
+    newQuiz = quiz;
+  }
   int correct_answer = 0, totalmarks = 0, quesion_number = 1, quesiontype = 0;
   String quiznumber = "Quiz";
   String stringAnswer = '';
@@ -185,7 +189,7 @@ setState(() {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => Teacher_main_function()));     });
+                            builder: (context) => TeacherHome()));     });
                     },
               ), //for finish question
 
@@ -557,7 +561,7 @@ setState(() {
     // ignore: deprecated_member_use
     Firestore.instance
         .collection('Quiz')
-        .doc(widget.quizName)
+        .doc(newQuiz.Title)
         .collection("NOQ").add({
 //      'teacherUID': UserD.userData.uid,
       'question': _questionController.text,
@@ -570,7 +574,7 @@ setState(() {
       //  answertype == 1 ?  'correct_option':correct_answer.toString():answertype==3 ?
       // 'correct_option':_shortquestionController.text,
 
-      'quiznumber': widget.quizName,
+      'quiznumber': newQuiz.Title,
       //'date': DateTime.now().millisecondsSinceEpoch
     }).then((value) {
       setState(() {

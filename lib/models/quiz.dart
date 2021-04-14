@@ -2,39 +2,42 @@ import 'package:json_annotation/json_annotation.dart';
 
 @JsonSerializable()
 class Quiz {
-  int id;
-  String name;
-  String marks;
-  String time;
-  String attemptsCount;
-  String description;
-
+  String Id;
+  String Title;
+  String Description;
+  int TotalMarks;
+  int AttemptsCount;
+  int NOQ;
+  int TimeLimit;
 
   Quiz(
-      {this.id,
-        this.name,
-        this.marks,
-        this.time,
-        this.attemptsCount,
-      this.description});
+      {this.Id,
+      this.Title,
+      this.Description,
+      this.TotalMarks,
+      this.AttemptsCount,
+      this.NOQ,
+      this.TimeLimit});
 
   Quiz.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    marks = json['marks'];
-    time = json['time'];
-    attemptsCount = json['attemptsCount'];
-    description = json['description'];
+    Id = json['Id'];
+    Title = json['Title'];
+    TotalMarks = json['TotalMarks'];
+    TimeLimit = json['TimeLimit'];
+    AttemptsCount = json['AttemptsCount'];
+    Description = json['Description'];
+    NOQ = json['NOQ'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
-    data['marks'] = this.marks;
-    data['time'] = this.time;
-    data['attemptsCount'] = this.attemptsCount;
-    data['description'] = this.description;
+    data['Id'] = this.Id;
+    data['Title'] = this.Title;
+    data['TotalMarks'] = this.TotalMarks;
+    data['TimeLimit'] = this.TimeLimit;
+    data['AttemptsCount'] = this.AttemptsCount;
+    data['Description'] = this.Description;
+    data['NOQ'] = this.NOQ;
     return data;
   }
 }
