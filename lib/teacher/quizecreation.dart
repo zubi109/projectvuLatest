@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -18,21 +20,22 @@ class quizcreator extends StatefulWidget {
 
 class _quizcreatorState extends State<quizcreator> {
 
-
-
-
-
-
-  int courectanswe = 0, totalmarks = 0, quesion_number = 1, quesiontype = 0;
+  int correct_answer = 0, totalmarks = 0, quesion_number = 1, quesiontype = 0;
   String quiznumber = "Quiz";
   String stringAnswer = '';
-
+bool _ischaked=false;
+void onchanged(bool value){
+setState(() {
+  _ischaked=value;
+});
+}
   TextEditingController _questionController = TextEditingController();
 
   TextEditingController _option1Controller = TextEditingController();
   TextEditingController _option2Controller = TextEditingController();
   TextEditingController _option3Controller = TextEditingController();
   TextEditingController _option4Controller = TextEditingController();
+  TextEditingController _shortquestionController = TextEditingController();
 
   int answertype = 0, opstionNumber = 1;
 
@@ -74,7 +77,7 @@ class _quizcreatorState extends State<quizcreator> {
                   answertype == 1
                       ? radio_Buttonoption()
                         : answertype == 2
-                            ? tru_false_Buttonoption()
+                            ? chackBox()
                              : answertype == 3
                                ? Short_Question_Buttonoption()
                                 : SizedBox(),
@@ -83,53 +86,80 @@ class _quizcreatorState extends State<quizcreator> {
                     child: Container(
                       height: 110,
                       width: 110,
-                      //padding: EdgeInsets.all(5.0),
                       decoration: BoxDecoration(
                         color: Colors.amber,
                         border: Border.all(width: 1, color: Colors.blueAccent),
                         borderRadius: BorderRadius.circular(60),
                       ),
-
                       child: Center(
                         child: Text(
                           "Add",
                           style: TextStyle(fontSize: 20.0 , fontWeight: FontWeight.bold, color: Colors.brown,),
                         ),
                       ),
-
                     ),
                     onTap: () {
-
                       setState(() {
-                        quesion_number = quesion_number + 1;
+
                         // totalmarks = int.parse(_questionMarksController.text) + totalmarks;
-                        if(answertype<3){
-                          if(_questionController.text.isEmpty||_option1Controller.text.isEmpty||_option2Controller.text.isEmpty||_option3Controller.text.isEmpty||_option4Controller.text.isEmpty){
-                            Fluttertoast.showToast(msg: 'Something is missing');
-                            if(_questionController.text.isEmpty){
-                              Fluttertoast.showToast(msg: 'Question is missing');
-                            }
-                            else  if(_option1Controller.text.isEmpty ){
-                              Fluttertoast.showToast(msg: 'option 1 is missing');
-                            }
-                            else  if(_option2Controller.text.isEmpty){
-                              Fluttertoast.showToast(msg: 'option 2 is missing');
-                            }
-                            else  if(_option3Controller.text.isEmpty ){
-                              Fluttertoast.showToast(msg: 'option 3 is missing');
-                            }
-                            else  if(_option4Controller.text.isEmpty ){
-                              Fluttertoast.showToast(msg: 'option 4 is missing');
-                            }
-                            // else  if(_questionMarksController.text.isEmpty && answertype==1){
-                            //   Fluttertoast.showToast(msg: 'please enter the question marks');
-                            // }
+                        if(answertype==1){
+                          if(_questionController.text.isEmpty){
+                            return Fluttertoast.showToast(msg: 'Question is missing');
+                          }
+                          else  if(_option1Controller.text.isEmpty ){
+                            return  Fluttertoast.showToast(msg: 'option 1 is missing');
+                          }
+                          else  if(_option2Controller.text.isEmpty){
+                            return Fluttertoast.showToast(msg: 'option 2 is missing');
+                          }
+                          else  if(_option3Controller.text.isEmpty ){
+                            return  Fluttertoast.showToast(msg: 'option 3 is missing');
+                          }
+                          else  if(_option4Controller.text.isEmpty ){
+                            return Fluttertoast.showToast(msg: 'option 4 is missing');
+                          }
+                          else if(correct_answer==0){
+                            return Fluttertoast.showToast(msg: 'Correct Answer is missing');
+                          }
+                          else{
+                            quiz_maker_fairbase();
                           }
                         }
+                        if(answertype==2){
+                          stringAnswer=_shortquestionController.text;
+                          if(_questionController.text.isEmpty){
+                            return Fluttertoast.showToast(msg: 'Question is missing');
+                          }
+                          else  if(_option1Controller.text.isEmpty ){
+                            return   Fluttertoast.showToast(msg: 'option 1 is missing');
+                          }
+                          else  if(_option2Controller.text.isEmpty){
+                            return Fluttertoast.showToast(msg: 'option 2 is missing');
+                          }
+                          else if(stringAnswer=='Null'){
+                            return Fluttertoast.showToast(msg: 'Correct Answer is missing');
+                            quesion_number = quesion_number + 1;
+                          }
                         else{
+                            quiz_maker_fairbase();
+                            quesion_number = quesion_number + 1;
+                          }
                         }
-                        quiz_maker_fairbase();
-
+                        if(answertype==3){
+                          if(_questionController.text.isEmpty){
+                                  return Fluttertoast.showToast(msg: 'Question is missing');}
+                          else if(_shortquestionController.text.isEmpty){
+                           return Fluttertoast.showToast(msg: 'Answer is missing');
+                          }
+                          else if(stringAnswer=='Null'){
+                            return Fluttertoast.showToast(msg: 'Correct Answer is missing');
+                            quesion_number = quesion_number + 1;
+                          }
+                          else{
+                            //stringAnswer=_shortquestionController.text;
+                            quiz_maker_fairbase();
+                          }
+                        }
                       });
                     },
                   ), //for Add question
@@ -229,10 +259,10 @@ class _quizcreatorState extends State<quizcreator> {
                   ),
             leading: Radio<int>(
               value: 1,
-              groupValue: courectanswe,
+              groupValue: correct_answer,
               onChanged: (int value) {
                 setState(() {
-                  courectanswe=value;
+                  correct_answer=value;
                 });
               },
             ),
@@ -257,10 +287,10 @@ class _quizcreatorState extends State<quizcreator> {
             ),
             leading: Radio<int>(
               value: 2,
-              groupValue: courectanswe,
+              groupValue: correct_answer,
               onChanged: (int value) {
                 setState(() {
-                  courectanswe=value;
+                  correct_answer=value;
                 });
               },
             ),
@@ -285,10 +315,10 @@ class _quizcreatorState extends State<quizcreator> {
             ),
             leading: Radio<int>(
               value: 3,
-              groupValue: courectanswe,
+              groupValue: correct_answer,
               onChanged: (int value) {
                 setState(() {
-                  courectanswe=value;
+                  correct_answer=value;
                 });
               },
             ),
@@ -313,10 +343,10 @@ class _quizcreatorState extends State<quizcreator> {
             ),
             leading: Radio<int>(
               value: 4,
-              groupValue: courectanswe,
+              groupValue: correct_answer,
               onChanged: (int value) {
                 setState(() {
-                  courectanswe=value;
+                  correct_answer=value;
                 });
               },
             ),
@@ -336,19 +366,16 @@ class _quizcreatorState extends State<quizcreator> {
             borderRadius: BorderRadius.circular(30),
             color: Colors.white,
           ),
-          child: ListTile(
+          child:
+          ListTile(
             title: const Text('True',
               style: TextStyle(color: Colors.amber ,),
             ),
             leading: Radio<int>(
               value: 1,
-              groupValue: courectanswe,
+              groupValue: correct_answer,
               onChanged: (int value) {
                 setState(() {
-                  courectanswe=value;
-                  stringAnswer="True";
-                  courectanswe==1?_option1Controller.text='True':SizedBox();
-                  courectanswe==1?_option2Controller.text='False':SizedBox();
                 });
               },
             ),
@@ -368,13 +395,13 @@ class _quizcreatorState extends State<quizcreator> {
             ),
             leading: Radio<int>(
               value: 2,
-              groupValue: courectanswe,
+              groupValue: correct_answer,
               onChanged: (int value) {
                 setState(() {
-                  courectanswe=value;
+                  correct_answer=value;
                   stringAnswer="False";
-                  courectanswe==2?_option2Controller.text='False':SizedBox();
-                  courectanswe==2?_option1Controller.text='True':SizedBox();
+                  correct_answer==2?_option2Controller.text='False':SizedBox();
+                  correct_answer==2?_option1Controller.text='True':SizedBox();
                 });
               },
             ),
@@ -401,22 +428,75 @@ class _quizcreatorState extends State<quizcreator> {
                 hintText: 'Enter Your Answer',
                 hintStyle: TextStyle(fontSize: 14.0, color: Colors.amber),
               ),
-              controller: _option1Controller,
-            ),
-            leading: Radio<int>(
-              value: 1,
-              groupValue: courectanswe,
-              onChanged: (int value) {
-                setState(() {
-                  courectanswe=value;
-                  stringAnswer=_option1Controller.text;
-                });
-              },
+              controller: _shortquestionController,
+
             ),
           ),
         ],
       ),
     );
+  }
+  Widget chackBox(){
+    return Column(
+      children: <Widget>[
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children:<Widget> [
+           Container(
+             height: 60,
+             width: 370,
+             margin: EdgeInsets.only(top: 7 ,left: 10 ,right: 10),
+             decoration: BoxDecoration(
+               borderRadius: BorderRadius.circular(30),
+               color: Colors.white,
+             ),
+             child:  new CheckboxListTile(
+                 title: const Text('True',
+                   style: TextStyle(color: Colors.amber ,),
+                 ),
+                 controlAffinity: ListTileControlAffinity.leading,
+                 value: _ischaked,
+                // groupValue: courectanswe,
+                 onChanged: (bool value){
+                   onchanged(value);
+                   correct_answer=value as int;
+                   stringAnswer="True";
+                   correct_answer==1?_option1Controller.text='True':SizedBox();
+                   correct_answer==1?_option2Controller.text='False':SizedBox();
+                 }
+
+
+
+                 ),
+
+           ),
+            Container(
+              height: 60,
+              width: 370,
+              margin: EdgeInsets.only(top: 7 ,left: 10 ,right: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                color: Colors.white,
+              ),
+              child: new CheckboxListTile(
+                  title: const Text('False',
+                    style: TextStyle(color: Colors.amber ,),
+                  ),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  value: _ischaked,
+                  onChanged: (bool value){
+                    onchanged(value);
+                    correct_answer=value as int;
+                    stringAnswer="False";
+                    correct_answer==2?_option2Controller.text='False':SizedBox();
+                    correct_answer==2?_option1Controller.text='True':SizedBox();  })
+              ,
+            )  ],
+        ),
+
+      ],
+    );
+
   }
   Widget NewQuestionTypes(){
     return Container(
@@ -482,16 +562,17 @@ class _quizcreatorState extends State<quizcreator> {
       'option2': _option2Controller.text,
       'option3': _option3Controller.text,
       'option4': _option4Controller.text,
-
-      'correct_option': answertype == 1 ?  courectanswe.toString():  stringAnswer,
+      //'correct_option': answertype==1?  correct_answer.toString():_shortquestionController.text,
+      'correct_option': answertype==1?  correct_answer.toString():answertype,
+      //  answertype == 1 ?  'correct_option':correct_answer.toString():answertype==3 ?
+      // 'correct_option':_shortquestionController.text,
 
       'quiznumber': widget.quizName,
       //'date': DateTime.now().millisecondsSinceEpoch
     }).then((value) {
       setState(() {
-        courectanswe = 0;
+        correct_answer = 0;
         stringAnswer = 'NULL';
-
         _questionController.clear();
         _option1Controller.clear();
         _option2Controller.clear();
