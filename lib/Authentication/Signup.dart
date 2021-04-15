@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:projectvu/Authentication/Login.dart';
 import 'package:projectvu/admin/admin_unverified_account.dart';
+import 'package:projectvu/models/User.dart';
 import 'package:projectvu/student/student_home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,30 +23,9 @@ class _signupState extends State<signup> {
        visiblesignup2 = true,
       selectroll = true;
   var roll = 0 , uid ;
-  createUserline() {
-   // asses the Quiz Model
-   //  User(
-   //    id:uid,
-   //    fullname:_fullnameController.text,
-   //    email:_emailController.text
-   //  );
-  }
-
-  // ..............for date of birth selection show the calendar........................
-//  String date = 'Select Date of Birth';
-
-  // Future<Null> selectTimePicker(BuildContext) async {
-  //   final DateTime picked = await showDatePicker(
-  //       context: context,
-  //       initialDate: DateTime.now(),
-  //       firstDate: DateTime(1975),
-  //       lastDate: DateTime.now());
-  //   if (picked != null && picked != date) {
-  //     setState(() {
-  //       date = '${picked.day}-${picked.month}-${picked.year}';
-  //       print(date.toString());
-  //     });
-  //   }
+  // createUserline() {
+  //   QCUser user = new QCUser(id: );
+  //
   // }
 
   TextEditingController _fullnameController = TextEditingController();
@@ -83,40 +63,18 @@ class _signupState extends State<signup> {
       )
           .then((v) async {
         if (v.user != null) {
-          if (roll == 1) {
-            editorDataEnter(v);
-          } else if (roll == 2) {
-            studentDataEnter(v);
-          }
+          studentDataEnter(v);
         }
       });
     }
   }
 
-  void editorDataEnter(v) {
-    FirebaseFirestore.instance.collection('teacher').doc(v.user.uid).set({
-      'name': _fullnameController.text,
-      'email': v.user.email,
-      'uid': v.user.uid,
-
-    }).then((value) {
-      setState(() {
-        uid= v.user.uid;
-        _fullnameController.clear();
-        _emailController.clear();
-        _passwordController.clear();
-        _confPassController.clear();
-      });
-    });
-  } //teacher data base
 
   void studentDataEnter(v) {
+    var user =  new QCUser(id: v.user.uid,email: v.user.email, fullName: _fullnameController.text);
+    var json =  user.toJson();
     //print('student sign up');
-    FirebaseFirestore.instance.collection('user').doc(v.user.uid).set({
-      'fullname': _fullnameController.text,
-      'email': v.user.email,
-      'uid': v.user.uid,
-    }).then((value) {
+    FirebaseFirestore.instance.collection('Student').doc(v.user.uid).set(json).then((value) {
       setState(() {
         uid= v.user.uid;
         _fullnameController.clear();
@@ -125,6 +83,7 @@ class _signupState extends State<signup> {
         _confPassController.clear();
       });
     });
+    Navigator.pop(context);
   }
 
 

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:projectvu/models/question.dart';
 import 'package:projectvu/models/quiz.dart';
 import 'package:projectvu/providers/QuizProvider.dart';
 import 'package:projectvu/teacher/CreateQuestion.dart';
@@ -8,6 +9,7 @@ import 'package:projectvu/utilities/quize_Data_Base.dart';
 import 'package:provider/provider.dart';
 import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 class CreateQuiz extends StatefulWidget {
   @override
@@ -34,38 +36,24 @@ class _CreateQuizState extends State<CreateQuiz> {
 
   createQuizeline() {
   // asses the Quiz Model
+    var uuid = Uuid();
     var NewQuiz = new Quiz(
+      Id: uuid.v4(),
       Title: _nameController.text,
       Description: _descriptionController.text,
       AttemptsCount: int.parse(_attemptsCountController.text),
       NOQ: int.parse(_numberofQuestionController.text),
       TimeLimit: int.parse(_timeLimitController.text),
     );
-
-
-
+    int QueCounter = 0;
+    List<Question> questions = [];
+    Question question = new Question();
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => CreateQuestion(
-                  NewQuiz,
+                  NewQuiz, QueCounter,questions, question
                 )));
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // if (_formKey.currentState.validate()) {
-    //   quizId = randomAlphaNumeric(16);
-    //
-    //   FirebaseFirestore.instance.collection('Quiz').doc(quizId).set({
-    //     "quizId": quizId,
-    //     "teacherid": prefs.getString("teacherid"),
-    //     "tilte": _subjectController.text
-    //   }).then((value) {
-    //     setState(() {
-    //       _isLoding = false;
-    //       Navigator.pushReplacement(context,
-    //           MaterialPageRoute(builder: (context) => quizcreator(quizId)));
-    //     });
-    //   });
-    // }
   }
 
   @override
@@ -199,7 +187,13 @@ class _CreateQuizState extends State<CreateQuiz> {
                           "Next",
                           style: TextStyle(fontSize: 22),
                         ),
-                        style: ButtonStyle(),
+                        style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                            if (states.contains(MaterialState.pressed))
+                              return Colors.green;
+                            return null; // Use the component's default.
+                          },
+                        )),
                       ),
                     ))
                   ]),

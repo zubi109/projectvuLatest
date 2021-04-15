@@ -5,7 +5,7 @@ class Question {
 
   String quizId;
   String id;
-  int type;
+  String type;
 
   String title;
   String option1;

@@ -1,14 +1,14 @@
 import 'package:json_annotation/json_annotation.dart';
 
 @JsonSerializable()
-class User {
+class QCUser {
   String id;
   String email;
   String fullName;
 
-  User({this.id, this.email, this.fullName});
+  QCUser({this.id, this.email, this.fullName});
 
-  User.fromJson(Map<String, dynamic> json) {
+  QCUser.fromJson(Map<String, dynamic> json) {
     id = json['Id'];
     email = json['Email'];
     fullName = json['FullName'];
