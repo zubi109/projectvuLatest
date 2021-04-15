@@ -56,7 +56,7 @@ class _LoginState extends State<Login> {
       if (v.user != null) {
         id = v.user.uid;
         email = v.user.email;
-        name = v.user.displayName;
+        // name = v.user.displayName;
 
         if (Global.AdminEmail == v.user.email)
           role = UserRole.Admin.toString().split('.').last;
@@ -87,8 +87,9 @@ class _LoginState extends State<Login> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(UserData.role.toString().split('.').last, role);
     prefs.setString(UserData.uid.toString().split('.').last, id);
-    prefs.setString(UserData.name.toString().split('.').last, name);
+    // prefs.setString(UserData.name.toString().split('.').last, name);
     prefs.setString(UserData.email.toString().split('.').last, email);
+    // prefs.setBool("IsLoggedIn", true);
     //'name': _nameController.text,
     //  'email': v.user.email,
   }

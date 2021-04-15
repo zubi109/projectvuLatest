@@ -62,35 +62,31 @@ class _splashScreenState extends State<splashScreenclass> {
   screen_director() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     var role = _prefs.getString(UserData.role.toString().split('.').last);
+    // var isLoggedIn = _prefs.getBool("IsLoggedIn");
     if (role == UserRole.Student.toString().split('.').last) {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) =>Std()));
-    } else if (role == UserRole.Admin.toString().split('.').last) {
-
+    }
+    else if (role == UserRole.Admin.toString().split('.').last) {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) => AdminUnverifiedAccountList()));
 
-      } else if (role == UserRole.Editor.toString().split('.').last)
-        {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => TeacherHome()));
-        }
-    else
-          {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Login()));
-          }
-
-
     }
-
-
+    else if (role == UserRole.Editor.toString().split('.').last){
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => TeacherHome()));
+    }
+    else{
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => Login()));
+    }
+    }
   }

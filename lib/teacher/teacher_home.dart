@@ -5,12 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:projectvu/Authentication/Login.dart';
 import 'package:projectvu/models/quiz.dart';
 import 'package:projectvu/teacher/CreateQuestion.dart';
+import 'package:projectvu/utilities/UserData.dart';
 import 'package:projectvu/utilities/quize_Data_Base.dart';
 import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'CreateQuiz.dart';
-import 'editor_view_quize.dart';
+import 'ViewQuiz.dart';
 
 class TeacherHome extends StatefulWidget {
   String speciality;
@@ -23,7 +24,6 @@ class TeacherHome extends StatefulWidget {
 }
 
 class _TeacherHomeState extends State<TeacherHome> {
-
   TextEditingController _subjectController = TextEditingController();
   bool _isLoding = false;
   List<Quiz> quizzes = [];
@@ -31,10 +31,8 @@ class _TeacherHomeState extends State<TeacherHome> {
   String quizId, quizename;
   DatabaseService databaseService = new DatabaseService();
 
-
-
-  int counter_for_Quiz_number=1;
-  bool color_selection_quiz_tile=true;
+  int counter_for_Quiz_number = 1;
+  bool color_selection_quiz_tile = true;
 
   // QuerySnapshot snapData;
 
@@ -111,7 +109,7 @@ class _TeacherHomeState extends State<TeacherHome> {
             child: Container(
               height: 50,
               width: 50,
-              margin:EdgeInsets.only(top: 20) ,
+              margin: EdgeInsets.only(top: 20),
               decoration: BoxDecoration(
                 color: Colors.amber,
                 border: Border.all(width: 1, color: Colors.blueAccent),
@@ -126,12 +124,12 @@ class _TeacherHomeState extends State<TeacherHome> {
             ),
             onTap: () async {
               setState(() {
-                FirebaseAuth.instance.signOut();
+                // FirebaseAuth.instance.signOut();
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (context) => (Login())));
               });
               SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setBool("student", false);
+              prefs.setString(UserData.role.toString().split('.').last, "LoggedOut");
             },
           ), // sign_out
 
@@ -162,17 +160,17 @@ class _TeacherHomeState extends State<TeacherHome> {
                             color: Colors.white,
                           ),
                           child: FlatButton(
-                           color: counter_for_Quiz_number%2==0?Colors.amber:Colors.white12,    //color: Colors.white,
+                            color: counter_for_Quiz_number % 2 == 0
+                                ? Colors.amber
+                                : Colors.white12, //color: Colors.white,
                             splashColor: Colors.white,
                             onPressed: () {
                               setState(() {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            (Editor_Quize_View(
-                                                quizzes[index].Title,
-                                                quizzes[index].Id))));
+                                        builder: (context) => (ViewQuiz(
+                                            quizzes[index]))));
                               });
                             },
                             child: Center(
@@ -239,182 +237,6 @@ class _TeacherHomeState extends State<TeacherHome> {
         },
         child: const Icon(Icons.add),
         backgroundColor: Colors.amber,
-      ),
-    );
-  }
-
-  Widget old(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(10),
-        color: Colors.grey,
-        child: Column(
-          children: [
-            Container(
-              margin: EdgeInsets.all(30),
-              child: FlatButton(
-                color: Colors.white60,
-                splashColor: Colors.white,
-                onPressed: () async {
-                  setState(() {
-                    FirebaseAuth.instance.signOut();
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => (Login())));
-                  });
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  prefs.setBool("student", false);
-                },
-                child: Text(
-                  "Sign_out",
-                  style: TextStyle(fontSize: 10.0, color: Colors.black),
-                ),
-              ),
-            ), // sign_out
-
-            SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 45),
-              child: (Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      child: Container(
-                        //  margin: EdgeInsets.only(top: 7,left: 10,right: 10),
-                        //  width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                          border: Border.all(width: 2, color: Colors.white),
-                          borderRadius: BorderRadius.circular(70),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "+",
-                            style: TextStyle(fontSize: 32, color: Colors.amber),
-                          ),
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CreateQuiz()));
-                        });
-                      },
-                    ),
-                    Container(
-                      height: 80,
-                      margin: EdgeInsets.only(top: 60, left: 10, right: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        color: Colors.white,
-                      ),
-                      child: Center(
-                        child: Text(
-                          "YOUR CREATED QUIZ LIST",
-                          style: TextStyle(fontSize: 24.0, color: Colors.amber),
-                        ),
-                      ),
-                    ), // Text
-                    Container(
-                        height: 70,
-                        margin: EdgeInsets.only(top: 1, left: 10, right: 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          color: Colors.white,
-                        ),
-                        child: Center(
-                          child: Text(
-                            "\t A father gives his child nothing \n better then a good education.",
-                            style: TextStyle(
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.amber),
-                          ),
-                        )),
-
-                    //***********************************************************************************
-                    // ******************************Take Quize********************************************************
-                    //************************************************************************************
-                    StreamBuilder(
-                        stream: FirebaseFirestore.instance
-                            .collection("Quiz")
-                            .where("teacherid", isEqualTo: widget.speciality)
-                            .snapshots(),
-                        builder: (BuildContext context, snapshot) {
-                          QuerySnapshot snapData = snapshot.data;
-                          if (!snapshot.hasData) {
-                            return CircularProgressIndicator();
-                          } else {
-                            return new ListView.builder(
-                                physics: NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: snapData.size,
-                                itemBuilder: (BuildContext context, int index) {
-                                  // Dismissible(
-                                  //   // Show a red background as the item is swiped away.
-                                  //   background: Container(color: Colors.grey),
-                                  //   key: Key(item),
-                                  //   onDismissed: (direction) {
-                                  //     setState(() {
-                                  //       items.removeAt(index);
-                                  //     });
-                                  //     ScaffoldMessenger
-                                  //         .of(context)
-                                  //         .showSnackBar(SnackBar(content: Text("$item dismissed")));
-                                  //   },
-                                  //   child: ListTile(title: Text('$')),
-                                  // );
-
-                                  return SizedBox(
-                                    child: Container(
-//                                height: MediaQuery.of(context).size.height,
-                                      width: MediaQuery.of(context).size.width,
-
-                                      height: 30,
-                                      margin: EdgeInsets.only(
-                                          top: 2, left: 20, right: 20),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: Colors.white,
-                                      ),
-                                      child: FlatButton(
-                                        color: Colors.white,
-                                        splashColor: Colors.white,
-                                        onPressed: () {
-                                          setState(() {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        (Editor_Quize_View(
-                                                            snapData.docs[index]
-                                                                ['tilte'],
-                                                            snapData.docs[index]
-                                                                ['quizId']))));
-                                          });
-                                        },
-                                        child: Center(
-                                          child: Text(
-                                            snapData.docs[index]['tilte'],
-                                            style: TextStyle(
-                                                fontSize: 20.0,
-                                                color: Colors.black54),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                });
-                          }
-                        }),
-                  ])),
-            ),
-          ],
-        ),
       ),
     );
   }
