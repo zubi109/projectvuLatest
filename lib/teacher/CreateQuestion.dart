@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:projectvu/models/question.dart';
 import 'package:projectvu/models/quiz.dart';
 import 'package:projectvu/teacher/teacher_home.dart';
 import 'package:projectvu/utilities/user.dart';
@@ -39,14 +40,70 @@ setState(() {
   TextEditingController _option2Controller = TextEditingController();
   TextEditingController _option3Controller = TextEditingController();
   TextEditingController _option4Controller = TextEditingController();
+  TextEditingController _questionMarksController = TextEditingController();
   TextEditingController _shortquestionController = TextEditingController();
 
   int answertype = 0, opstionNumber = 1;
+//  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // Provider.of<QuizProvider>(context);
+  }
+
+  createQuizeline() {
+    // asses the Quiz Model
+     Question(
+     //  id: ,
+       title: _questionController.text,
+
+       option1: _option1Controller.text,
+       option2: _option2Controller.text,
+       option3: _option2Controller.text,
+       option4: _option4Controller.text,
+       marks: int.parse(_questionMarksController.text),
+       //quizId: ,
+      // type:answertype ,
+       //answer: answertype,
+       // AttemptsCount: int.parse(_attemptsCountController.text),
+      // NOQ: int.parse(_numberofQuestionController.text),
+      // TimeLimit: int.parse(_timeLimitController.text),
+    );
+
+
+
+    // Navigator.push(
+    //     context,
+    //     MaterialPageRoute(
+    //         builder: (context) => CreateQuestion(
+    //           Question(),
+    //         )));
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // if (_formKey.currentState.validate()) {
+    //   quizId = randomAlphaNumeric(16);
+    //
+    //   FirebaseFirestore.instance.collection('Quiz').doc(quizId).set({
+    //     "quizId": quizId,
+    //     "teacherid": prefs.getString("teacherid"),
+    //     "tilte": _subjectController.text
+    //   }).then((value) {
+    //     setState(() {
+    //       _isLoding = false;
+    //       Navigator.pushReplacement(context,
+    //           MaterialPageRoute(builder: (context) => quizcreator(quizId)));
+    //     });
+    //   });
+    // }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
        resizeToAvoidBottomInset: true,
+      appBar: AppBar(
+        backgroundColor: Colors.amber,
+        title: const Text('Create Question'),
+      ),
       body: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
@@ -85,8 +142,37 @@ setState(() {
                              : answertype == 3
                                ? Short_Question_Buttonoption()
                                 : SizedBox(),
-
-                  GestureDetector(
+                  Container(
+                    alignment: Alignment.topCenter,
+                   // width: MediaQuery.of(context).size.width * .20,
+                    height: 110,
+                    width: 110,
+                    decoration: BoxDecoration(
+                      color: Colors.amber,
+                      border: Border.all(width: 1, color: Colors.blueAccent),
+                      borderRadius: BorderRadius.circular(60),
+                    ),
+                    child: Center(
+                      child: TextFormField(
+                        maxLength: 1,
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                            counter: SizedBox(),
+                            //filled: true,
+                            //fillColor: Colors.white60,
+                            border: InputBorder.none,
+                            hintText: ' Marks  ',
+                            hintStyle: TextStyle( fontSize: 12),
+                            contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10)),
+                        onChanged: (marks) {
+                          setState(() {});
+                          // print(questionmarks);
+                        },
+                        controller: _questionMarksController,
+                      ),
+                    ),
+                  ),                  GestureDetector(
                     child: Container(
                       height: 110,
                       width: 110,
@@ -212,7 +298,7 @@ setState(() {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            '\t\t Q ' + quesion_number.toString() + ':\t\t',
+            '\t\t Q ' + quesion_number.toString() + '/',
             style: TextStyle(
                 color: Colors.grey,
                 fontSize: 24,

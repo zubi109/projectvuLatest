@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:projectvu/models/quiz.dart';
 import 'package:projectvu/providers/QuizProvider.dart';
 import 'package:projectvu/teacher/CreateQuestion.dart';
@@ -32,6 +33,7 @@ class _CreateQuizState extends State<CreateQuiz> {
   }
 
   createQuizeline() {
+  // asses the Quiz Model
     var NewQuiz = new Quiz(
       Title: _nameController.text,
       Description: _descriptionController.text,
@@ -70,6 +72,7 @@ class _CreateQuizState extends State<CreateQuiz> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.amber,
         centerTitle: true,
         title: Text(
           'Create Quiz',
@@ -89,11 +92,15 @@ class _CreateQuizState extends State<CreateQuiz> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   TextFormField(
+                    cursorColor: Colors.amber,
+
+                    keyboardType: TextInputType.text,
                     decoration: InputDecoration(
                       enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey)),
                       focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue)),
+                          borderSide: BorderSide(color: Colors.amber)),
+
                       hintText: 'Quiz Name',
                     ),
                     controller: _nameController,
@@ -102,11 +109,12 @@ class _CreateQuizState extends State<CreateQuiz> {
                     height: 20,
                   ),
                   TextFormField(
+                    cursorColor: Colors.amber,
                     decoration: InputDecoration(
                       enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey)),
                       focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue)),
+                          borderSide: BorderSide(color: Colors.amber)),
                       hintText: 'Description',
                     ),
                     controller: _descriptionController,
@@ -115,12 +123,13 @@ class _CreateQuizState extends State<CreateQuiz> {
                     height: 20,
                   ),
                   TextFormField(
+                    cursorColor: Colors.amber,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey)),
                       focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue)),
+                          borderSide: BorderSide(color: Colors.amber)),
                       hintText: 'No. of Questions',
                     ),
                     controller: _numberofQuestionController,
@@ -129,12 +138,13 @@ class _CreateQuizState extends State<CreateQuiz> {
                     height: 20,
                   ),
                   TextFormField(
+                    cursorColor: Colors.amber,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey)),
                       focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue)),
+                          borderSide: BorderSide(color: Colors.amber)),
                       hintText: 'Time Limit (seconds)',
                     ),
                     controller: _timeLimitController,
@@ -143,12 +153,13 @@ class _CreateQuizState extends State<CreateQuiz> {
                     height: 20,
                   ),
                   TextFormField(
+                    cursorColor: Colors.amber,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey)),
                       focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue)),
+                          borderSide: BorderSide(color: Colors.amber)),
                       hintText: 'Allowed Attempts',
                     ),
                     controller: _attemptsCountController,
@@ -162,8 +173,27 @@ class _CreateQuizState extends State<CreateQuiz> {
                         child: Container(
                       height: 50,
                       child: ElevatedButton(
+
                         onPressed: () {
-                          createQuizeline();
+                          if(_nameController.text.isEmpty){
+                            return Fluttertoast.showToast(msg: 'Pleas Enter Quiz Name');
+                          }
+                          else if(_descriptionController.text.isEmpty){
+                            return Fluttertoast.showToast(msg: 'Pleas Enter Quiz Descriptions');
+                          }
+                          else if(_numberofQuestionController.text.isEmpty){
+                            return Fluttertoast.showToast(msg: 'Pleas Enter Number of Question');
+                          }
+                          else if(_timeLimitController.text.isEmpty){
+                            return Fluttertoast.showToast(msg: 'Pleas Enter Quiz Time Limit in Seconds');
+                          }
+                          else if(_attemptsCountController.text.isEmpty){
+                            return Fluttertoast.showToast(msg: 'Pleas write Quiz Name');
+                          }
+                          else{
+                            createQuizeline();
+                          }
+
                         },
                         child: Text(
                           "Next",

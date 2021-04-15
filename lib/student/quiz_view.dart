@@ -19,6 +19,11 @@ class _View_quizState extends State<View_quiz> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
+      appBar: AppBar(
+        backgroundColor: Colors.amber,
+        title: const Text('Question List'),
+      ),
       resizeToAvoidBottomInset: false,
     //  resizeToAvoidBottomInset: false,
       backgroundColor: Colors.lightGreen,

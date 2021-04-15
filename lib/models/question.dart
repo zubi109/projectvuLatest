@@ -2,40 +2,53 @@ import 'package:json_annotation/json_annotation.dart';
 
 @JsonSerializable()
 class Question {
-  String answer;
-  String option3;
+
   String quizId;
   String id;
-  int marks;
-  String option1;
-  String option4;
-  String type;
-  String option2;
+  int type;
+
   String title;
+  String option1;
+  String option2;
+  String option3;
+  String option4;
+
+  String answer;
+  int marks;
 
   Question(
-      {this.answer,
-        this.option3,
+      {
+
         this.quizId,
         this.id,
-        this.marks,
-        this.option1,
-        this.option4,
         this.type,
+
+        this.title,
+        this.option1,
         this.option2,
-        this.title});
+        this.option3,
+        this.option4,
+
+        this.answer,
+        this.marks,
+        });
 
   Question.fromJson(Map<String, dynamic> json) {
-    answer = json['Answer'];
-    option3 = json['Option3'];
+
     quizId = json['QuizId'];
     id = json['Id'];
-    marks = json['Marks'];
-    option1 = json['Option1'];
-    option4 = json['Option4'];
     type = json['Type'];
-    option2 = json['Option2'];
+
     title = json['Title'];
+    option1 = json['Option1'];
+    option2 = json['Option2'];
+    option3 = json['Option3'];
+    option4 = json['Option4'];
+
+    answer = json['Answer'];
+    marks = json['Marks'];
+
+
   }
 
   Map<String, dynamic> toJson() {

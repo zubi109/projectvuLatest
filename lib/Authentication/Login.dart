@@ -11,6 +11,8 @@ import 'package:projectvu/utilities/UserRole.dart';
 import 'package:projectvu/utilities/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'Signup.dart';
+
 class Login extends StatefulWidget {
   @override
   _LoginState createState() => _LoginState();
@@ -154,8 +156,9 @@ class _LoginState extends State<Login> {
                         setState(() {
                           visiblelog = !visiblelog;
                         });
-                        Fluttertoast.showToast(
-                          msg: 'Write toast msg here',
+                        visiblelog==true?Fluttertoast.showToast(
+                          msg: 'Password NOT visible',):Fluttertoast.showToast(
+                          msg: 'Password visible',
                         );
                       },
                       child: visiblelog
@@ -183,9 +186,13 @@ class _LoginState extends State<Login> {
                   padding: EdgeInsets.all(1),
                   splashColor: Colors.white,
                   onPressed: () {
-                    if (_emailController.text.length < 5) {
+                    if (_emailController.text.isEmpty) {
                       Fluttertoast.showToast(msg: 'Please enter email');
-                    } else {
+                    }
+                    if (_passwordController.text.isEmpty) {
+                      Fluttertoast.showToast(msg: 'Please enter Password');
+                    }
+                    else {
                       authentication_login();
                     }
                   },
@@ -204,8 +211,10 @@ class _LoginState extends State<Login> {
                 InkWell(
                   onTap: () {
                     setState(() {
-                      // loginScreen = false;
-                    });
+                          Navigator.push(context, MaterialPageRoute(
+                          builder: (context) => (signup())));
+                          });
+                          // loginScreen = false;
                   },
                   child: Text(
                     "REGISTER",
