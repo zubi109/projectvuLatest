@@ -8,7 +8,6 @@ import 'package:projectvu/models/question.dart';
 import 'package:projectvu/models/quiz.dart';
 import 'package:projectvu/teacher/teacher_home.dart';
 import 'package:projectvu/utilities/QuestionType.dart';
-import 'package:projectvu/utilities/user.dart';
 import 'package:projectvu/utilities/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -475,61 +474,6 @@ setState(() {
               onChanged: (String value) {
                 setState(() {
                   newQuestion.answer = value;
-                });
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-  Widget tru_false_Buttonoption(){
-    return Column(
-      children: <Widget>[
-        Container(
-          height: 60,
-          width: 370,
-          margin: EdgeInsets.only(top:7 ,left: 10 ,right: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            color: Colors.white,
-          ),
-          child:
-          ListTile(
-            title: const Text('True',
-              style: TextStyle(color: Colors.amber ,),
-            ),
-            leading: Radio<int>(
-              value: 1,
-              groupValue: correct_answer,
-              onChanged: (int value) {
-                setState(() {
-                });
-              },
-            ),
-          ),
-        ),
-        Container(
-          height: 60,
-          width: 370,
-          margin: EdgeInsets.only(top:1 ,left: 10 ,right: 10 ,bottom: 19),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            color: Colors.white,
-          ),
-          child: ListTile(
-            title: const Text('False',
-              style: TextStyle(color: Colors.amber),
-            ),
-            leading: Radio<int>(
-              value: 2,
-              groupValue: correct_answer,
-              onChanged: (int value) {
-                setState(() {
-                  correct_answer=value;
-                  stringAnswer="False";
-                  correct_answer==2?_option2Controller.text='False':SizedBox();
-                  correct_answer==2?_option1Controller.text='True':SizedBox();
                 });
               },
             ),

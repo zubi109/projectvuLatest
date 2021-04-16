@@ -29,8 +29,6 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      //resizeToAvoidBottomPadding: false,
-
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         physics: AlwaysScrollableScrollPhysics(),
@@ -39,7 +37,6 @@ class _LoginState extends State<Login> {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           child: loginpage(),
-          // child: loginScreen ? loginpage() : signUpFields(),
         ),
       ),
     );
@@ -104,33 +101,43 @@ class _LoginState extends State<Login> {
               height: 110,
               width: 110,
               decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(width: 1, color: Colors.black),
+                color: Colors.amber
+                ,
+                //border: Border.all(width: 1, color: Colors.black),
                 borderRadius: BorderRadius.circular(120),
               ),
               child: Center(
+
                 child: Text(
                   'Login',
                   style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.brown),
+                      fontSize:32.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueAccent.withOpacity(1.0),
+                  ),
                 ),
               ),
             ), // logo title
             Column(mainAxisSize: MainAxisSize.min, children: [
               Container(
-                margin: EdgeInsets.all(2),
+                margin: EdgeInsets.all(5),
+
                 decoration: BoxDecoration(
+                  // //border: Border.all(width: 1, color: Colors.black),
+                  // borderRadius: BorderRadius.circular(10),
                   color: Colors.white,
-                  border: Border.all(width: 1, color: Colors.black),
-                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: TextFormField(
+                  cursorColor: Colors.amber,
                   decoration: InputDecoration(
+                    enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey)),
+                    focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.amber)),
                     contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                     border: InputBorder.none,
-                    hintText: 'mike@mike.com',
+                    hintText: 'user@quizcreator.com',
+                    hintStyle: TextStyle(fontSize: 16.0, color: Colors.amber),
                     prefixIcon: Icon(
                       Icons.email,
                     ),
@@ -143,91 +150,91 @@ class _LoginState extends State<Login> {
                 margin: EdgeInsets.all(5),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  border: Border.all(width: 1, color: Colors.black),
-                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: TextFormField(
+               child: TextFormField(
+                  cursorColor: Colors.amber,
                   decoration: InputDecoration(
-                    contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                    border: InputBorder.none,
+                    enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey)),
+                    focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.amber)),
                     hintText: '**********',
+                    hintStyle: TextStyle(fontSize: 16.0, color: Colors.amber),
                     prefixIcon: Icon(Icons.lock),
                     suffixIcon: GestureDetector(
                       onTap: () {
                         setState(() {
                           visiblelog = !visiblelog;
                         });
-                        visiblelog==true?Fluttertoast.showToast(
-                          msg: 'Password NOT visible',):Fluttertoast.showToast(
+                        visiblelog == true
+                            ? Fluttertoast.showToast(
+                          msg: 'Password NOT visible',
+                        )
+                            : Fluttertoast.showToast(
                           msg: 'Password visible',
                         );
                       },
                       child: visiblelog
                           ? Icon(Icons.remove_red_eye_outlined)
                           : Icon(Icons.remove_red_eye),
-                    ),
-                  ),
-                  obscureText: visiblelog,
-                  controller: _passwordController,
-                ),
-              ), //password
-              // password
+                    ), ),
+                 obscureText: visiblelog,
+                 controller: _passwordController,),
+
+              ), // password
 
               Container(
+                height: 50,
+                width: 90,
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(width: 1, color: Colors.blueAccent),
+                  color: Colors.amber,
+                  border: Border.all(width: 2, color: Colors.blueAccent),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: FlatButton(
-                  color: Colors.white,
-                  textColor: Colors.black,
-                  disabledColor: Colors.grey,
-                  disabledTextColor: Colors.black,
-                  padding: EdgeInsets.all(1),
-                  splashColor: Colors.white,
-                  onPressed: () {
+                child: GestureDetector(
+                  onTap: () {
                     if (_emailController.text.isEmpty) {
                       Fluttertoast.showToast(msg: 'Please enter email');
                     }
                     if (_passwordController.text.isEmpty) {
                       Fluttertoast.showToast(msg: 'Please enter Password');
-                    }
-                    else {
+                    } else {
                       authentication_login();
                     }
                   },
-                  child: Text(
-                    "LogIn",
-                    style: TextStyle(fontSize: 20.0),
+                  child: Center(
+                    child: Text(
+                      "LogIn",
+                      style: TextStyle(fontSize: 20.0 , color:Colors.blueAccent),
+                    ),
                   ),
                 ),
               ), //login button
             ]),
-            Container(
-                child: Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Don't Have an Account?"),
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                          Navigator.push(context, MaterialPageRoute(
-                          builder: (context) => (signup())));
-                          });
-                          // loginScreen = false;
-                  },
-                  child: Text(
-                    "REGISTER",
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: Colors.deepOrange,
-                    ),
-                  ),
-                )
+            Text("Don't Have an Account?"),
+            InkWell(
+              onTap: () {
+                setState(() {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => (signup())));
+                });
+                // loginScreen = false;
+              },
+              child: Text(
+                "REGISTER",
+                style: TextStyle(
+                  fontSize: 18.0,
+                  color: Colors.amber,
+                ),
+              ),
+            )
               ],
-            )),
+            ), // for sign_up
           ],
-        ));
+        )
+    );
   }
 }

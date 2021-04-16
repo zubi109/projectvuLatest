@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:projectvu/models/quiz.dart';
 import 'package:projectvu/student/student_home_page.dart';
-import 'package:projectvu/utilities/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AttemptQuize extends StatefulWidget {
@@ -101,8 +100,8 @@ String fetched_corect_answer;
                 onPressed: () {
                   setState(() {
                     FirebaseAuth.instance.signOut();
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => (user_role())));
+                    // Navigator.pushReplacement(context,
+                    //     MaterialPageRoute(builder: (context) => (user_role())));
                   });
                 },
                 child: Text(

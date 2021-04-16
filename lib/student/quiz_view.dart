@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:projectvu/teacher/CreateQuestion.dart';
 import 'package:projectvu/teacher/teacher_home.dart';
-import 'package:projectvu/utilities/user.dart';
 import 'package:projectvu/utilities/user_model.dart';
 
 class View_quiz extends StatefulWidget {
@@ -69,10 +68,10 @@ class _View_quizState extends State<View_quiz> {
                 onPressed: () {
                   setState(() {
                     FirebaseAuth.instance.signOut();
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => (user_role())));
+                    // Navigator.pushReplacement(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (context) => (user_role())));
                   });
                 },
                 child: Text(

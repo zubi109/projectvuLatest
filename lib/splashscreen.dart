@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:projectvu/student/student_home_page.dart';
 import 'package:projectvu/utilities/UserData.dart';
 import 'package:projectvu/utilities/UserRole.dart';
-import 'package:projectvu/utilities/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Authentication/Login.dart';

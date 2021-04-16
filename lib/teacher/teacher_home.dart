@@ -101,25 +101,16 @@ class _TeacherHomeState extends State<TeacherHome> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.amber,
-        title: const Text('Quizzes List'),
-      ),
-      body: Column(
-        children: [
-          GestureDetector(
-            child: Container(
-              height: 50,
-              width: 50,
-              margin: EdgeInsets.only(top: 20),
-              decoration: BoxDecoration(
-                color: Colors.amber,
-                border: Border.all(width: 1, color: Colors.blueAccent),
-                borderRadius: BorderRadius.circular(60),
-              ),
-              child: Center(
-                child: Text(
-                  "Sign_out",
-                  style: TextStyle(fontSize: 10.0, color: Colors.black),
-                ),
+        title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children:[
+          const Text('Quizzes List'),
+          SizedBox(),
+          InkWell(
+            child: Center(
+              child: Text(
+                "Sign_out",
+                style: TextStyle(fontSize: 16.0, color: Colors.white),
               ),
             ),
             onTap: () async {
@@ -131,7 +122,11 @@ class _TeacherHomeState extends State<TeacherHome> {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.setString(UserData.role.toString().split('.').last, "LoggedOut");
             },
-          ), // sign_out
+          ),
+        ])
+      ),
+      body: Column(
+        children: [
 
           _isLoding == false
               ? ListView.builder(

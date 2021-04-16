@@ -6,7 +6,6 @@ import 'package:projectvu/models/quiz.dart';
 import 'package:projectvu/student/student_home_page.dart';
 import 'package:projectvu/teacher/teacher_home.dart';
 import 'package:projectvu/utilities/QuestionType.dart';
-import 'package:projectvu/utilities/user.dart';
 
 class ViewQuiz extends StatefulWidget {
   Quiz quiz;
@@ -52,7 +51,6 @@ class _ViewQuizState extends State<ViewQuiz> {
         title: const Text('Quiz View'),
       ),
       resizeToAvoidBottomInset: false,
-      //resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body: boddy(),
     );
@@ -63,15 +61,10 @@ class _ViewQuizState extends State<ViewQuiz> {
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.all(9),
-      margin: EdgeInsets.only(
-        left: 8,
-        right: 8,
-        top: 22,
-      ),
+      margin: EdgeInsets.only(left: 8, right: 8, top: 22,),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // row for btn
           Container(
             height: 150,
             child: Card(
@@ -87,7 +80,7 @@ class _ViewQuizState extends State<ViewQuiz> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text("Title: ",
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                            style: TextStyle(fontSize: 36,fontWeight: FontWeight.bold,color: Colors .amber)),
                         Text("${widget.quiz.Title}"),
                       ],
                     ),
@@ -95,8 +88,7 @@ class _ViewQuizState extends State<ViewQuiz> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text("Description: ",
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text("${widget.quiz.Description}"),
+                            style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors .amber)),                        Text("${widget.quiz.Description}"),
                       ],
                     ),
                     Row(
@@ -104,12 +96,12 @@ class _ViewQuizState extends State<ViewQuiz> {
                       children: [
                         Row(children: [
                           Text("Time Limit: ",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                              style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors .amber)),
                           Text("${widget.quiz.TimeLimit}s"),
                         ]),
                         Row(children: [
                           Text("Total Marks: ",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                              style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors .amber)),
                           Text("${widget.quiz.TotalMarks}s"),
                         ]),
                       ],
@@ -119,13 +111,11 @@ class _ViewQuizState extends State<ViewQuiz> {
                       children: [
                         Row(children: [
                           Text("No. of Questions: ",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          Text("${widget.quiz.NOQ}"),
+                              style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors .amber)),                          Text("${widget.quiz.NOQ}"),
                         ]),
                         Row(children: [
                           Text("Attempts Limit: ",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          Text("${widget.quiz.AttemptsCount}s"),
+                              style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors .amber)),                          Text("${widget.quiz.AttemptsCount}s"),
                         ]),
                       ],
                     ),
@@ -139,7 +129,7 @@ class _ViewQuizState extends State<ViewQuiz> {
         ],
       ),
     );
-  }
+  } // quiz info
 
   Widget listBuilderWidget() {
     if (questions != null) {
@@ -160,10 +150,11 @@ class _ViewQuizState extends State<ViewQuiz> {
         children: [
           // Text(data["question"]),
           ListTile(
-            title: Text('Q: ' + question.title),
+            title: Text('Q: ' + question.title,
+            style: TextStyle(color: Colors.amber),),
           ),
           ListTile(
-            title: Text('A: ' + question.answer),
+            title: Text('Answer: ' + question.answer),
           ),
           ListTile(
             title: Text('Question Type: ' + question.type),
@@ -189,16 +180,6 @@ class _ViewQuizState extends State<ViewQuiz> {
                   ],
                 )
               : SizedBox()
-
-          // ListTile(
-          //   title: Text("      " + data["option2"]),
-          // ),
-          // ListTile(
-          //   title: Text("      " + data["option3"]),
-          // ),
-          // ListTile(
-          //   title: Text("      " + data["option4"]),
-          // ),
         ],
       ),
     );

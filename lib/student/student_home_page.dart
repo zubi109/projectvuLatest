@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
-import 'package:projectvu/utilities/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'attempt_quize.dart';
@@ -42,8 +41,8 @@ class _stdState extends State<Std> {
               onPressed: () async {
                 setState(() {
                   FirebaseAuth.instance.signOut();
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => (user_role())));
+                  // Navigator.pushReplacement(context,
+                  //     MaterialPageRoute(builder: (context) => (user_role())));
                 });
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 prefs.setBool("student", false);
