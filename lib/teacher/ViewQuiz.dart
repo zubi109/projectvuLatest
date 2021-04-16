@@ -102,7 +102,7 @@ class _ViewQuizState extends State<ViewQuiz> {
                         Row(children: [
                           Text("Total Marks: ",
                               style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors .amber)),
-                          Text("${widget.quiz.TotalMarks}s"),
+                          Text("${widget.quiz.TotalMarks}"),
                         ]),
                       ],
                     ),
@@ -115,7 +115,8 @@ class _ViewQuizState extends State<ViewQuiz> {
                         ]),
                         Row(children: [
                           Text("Attempts Limit: ",
-                              style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors .amber)),                          Text("${widget.quiz.AttemptsCount}s"),
+                              style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors .amber)),
+                          Text(widget.quiz.AttemptsCount == null ? "0" : widget.quiz.AttemptsCount.toString()),
                         ]),
                       ],
                     ),

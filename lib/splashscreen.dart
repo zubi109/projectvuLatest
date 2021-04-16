@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:projectvu/student/StudentHome.dart';
 import 'package:projectvu/student/student_home_page.dart';
 import 'package:projectvu/utilities/UserData.dart';
 import 'package:projectvu/utilities/UserRole.dart';
@@ -63,10 +64,8 @@ class _splashScreenState extends State<splashScreenclass> {
     var role = _prefs.getString(UserData.role.toString().split('.').last);
     // var isLoggedIn = _prefs.getBool("IsLoggedIn");
     if (role == UserRole.Student.toString().split('.').last) {
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>Std()));
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (context) => StudentHome()));
     }
     else if (role == UserRole.Admin.toString().split('.').last) {
       Navigator.pushReplacement(

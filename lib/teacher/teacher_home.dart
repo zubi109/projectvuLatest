@@ -179,46 +179,6 @@ class _TeacherHomeState extends State<TeacherHome> {
                         ),
                       ),
                     );
-
-//             return SizedBox(
-//               child: Container(
-// //                                height: MediaQuery.of(context).size.height,
-//                 width: MediaQuery.of(context).size.width,
-//
-//                 height: 30,
-//                 margin: EdgeInsets.only(
-//                     top: 2, left: 20, right: 20),
-//                 decoration: BoxDecoration(
-//                   borderRadius: BorderRadius.circular(10),
-//                   color: Colors.white,
-//                 ),
-//                 child: FlatButton(
-//                   color: Colors.white,
-//                   splashColor: Colors.white,
-//                   onPressed: () {
-//                     setState(() {
-//                       Navigator.push(
-//                           context,
-//                           MaterialPageRoute(
-//                               builder: (context) =>
-//                               (Editor_Quize_View(
-//                                   snapData.docs[index]
-//                                   ['Title'],
-//                                   snapData.docs[index]
-//                                   ['Id']))));
-//                     });
-//                   },
-//                   child: Center(
-//                     child: Text(
-//                       snapData.docs[index]['Title'],
-//                       style: TextStyle(
-//                           fontSize: 20.0,
-//                           color: Colors.black54),
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             );
                   })
               : Center(
                   child: CircularProgressIndicator(),

@@ -4,6 +4,7 @@ import 'package:flutter/painting.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:projectvu/student/StudentHome.dart';
 import 'package:projectvu/teacher/teacher_home.dart';
 import 'package:projectvu/utilities/GlobalProperties.dart';
 import 'package:projectvu/utilities/UserData.dart';
@@ -77,7 +78,7 @@ class _LoginState extends State<Login> {
                 MaterialPageRoute(builder: (context) => TeacherHome()));
           else
             Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => TeacherHome()));
+                MaterialPageRoute(builder: (context) => StudentHome()));
         });
       }
     });
