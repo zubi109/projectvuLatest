@@ -156,7 +156,11 @@ class _ViewQuizState extends State<ViewQuiz> {
             return listTile(questions[index]);
           });
     } else {
-      return CircularProgressIndicator();
+      return CircularProgressIndicator(
+        backgroundColor: Colors.amber,
+        valueColor:
+        new AlwaysStoppedAnimation<Color>(Colors.white54),
+      );
     }
   }
 
@@ -174,12 +178,11 @@ class _ViewQuizState extends State<ViewQuiz> {
           // SharedPreferences prefs = await SharedPreferences.getInstance();
           // prefs.getString(UserData.role.toString().split('.').last);
           // //role = UserRole.Student.toString().split('.').last;
-
-          ListTile(
-            title: role == UserRole.Student.toString().split(".").last
-                ? SizedBox()
-                : Text('Answer: ' + question.answer),
-          ), //Answer
+          role != UserRole.Student.toString().split(".").last
+          ?ListTile(
+            title: Text('Answer: ' + question.answer),
+          )
+          :SizedBox(), //Answer
           ListTile(
             title: Text('Question Type: ' + question.type),
           ), //question type

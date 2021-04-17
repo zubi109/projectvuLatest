@@ -5,25 +5,24 @@ import 'package:projectvu/models/attempt.dart';
 import 'package:projectvu/models/question.dart';
 import 'package:projectvu/models/quiz.dart';
 import 'package:projectvu/utilities/QuestionType.dart';
-import 'package:projectvu/utilities/UserData.dart';
-import 'package:projectvu/utilities/UserRole.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
 
-class ViewResult extends StatefulWidget {
+class ViewResultForAdmin extends StatefulWidget {
   Quiz quiz;
-  ViewResult(quiz) {
+  String stuId;
+  ViewResultForAdmin(quiz,stuId) {
     this.quiz = quiz;
+    this.stuId = stuId;
   }
   @override
-  _ViewResultState createState() => _ViewResultState();
+  _ViewResultForAdminState createState() => _ViewResultForAdminState();
 }
 
-class _ViewResultState extends State<ViewResult> {
+class _ViewResultForAdminState extends State<ViewResultForAdmin> {
   var currenindex = 0;
   var quizlength = 0;
-  String role;
+  // String role;
 
   List<Question> questions = [];
   List<Answer> answers = [];
@@ -42,8 +41,7 @@ class _ViewResultState extends State<ViewResult> {
     setState(() {
       isLoading = true;
     });
-    var pref = await SharedPreferences.getInstance();
-    var stuId = pref.getString(UserData.uid.toString().split(".").last);
+    var stuId = widget.stuId;
 
     var qSnap = await FirebaseFirestore.instance
         .collection("Questions")
@@ -65,7 +63,6 @@ class _ViewResultState extends State<ViewResult> {
     }
 
     setState(() {
-      role = pref.getString(UserData.role.toString().split(".").last);
       questions = qlist;
       attList.sort((a, b) => a.timeStamp.compareTo(b.timeStamp));
       attempt = attList.last;

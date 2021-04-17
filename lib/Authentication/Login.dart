@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:projectvu/admin/AdminHome.dart';
 import 'package:projectvu/student/StudentHome.dart';
 import 'package:projectvu/teacher/teacher_home.dart';
 import 'package:projectvu/utilities/GlobalProperties.dart';
@@ -20,6 +22,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   bool visiblelog = true;
+  bool isLoading = false;
   var id, email, name, role;
 
   TextEditingController _emailController = TextEditingController();
@@ -28,74 +31,93 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-      foregroundColor: Colors.amber,
-        title: Text(''),
-      ),
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: Card(
-          margin: EdgeInsets.all(20),
-              child: loginpage()
-          ),
-        ),
+      body: Card(
+      margin: EdgeInsets.all(20),
+          child: loginpage()
       ),
     );
   }
 
   Future<void> authentication_login() async {
+    setState(() {
+      isLoading = true;
+    });
     print(_emailController.text);
     print(_passwordController.text);
     FirebaseAuth auth = FirebaseAuth.instance;
-    await auth
-        .signInWithEmailAndPassword(
-            email: _emailController.text, password: _passwordController.text)
-        .then((v) {
-      if (v.user != null) {
-        id = v.user.uid;
-        email = v.user.email;
-        // name = v.user.displayName;
-
-        if (Global.AdminEmail == v.user.email)
-          role = UserRole.Admin.toString().split('.').last;
-        else if (Global.EditorEmail == v.user.email)
-          role = UserRole.Editor.toString().split('.').last;
-        else
-          role = UserRole.Student.toString().split('.').last;
-
-        FirebaseFirestore.instance
-            .collection(role)
-            .doc(v.user.uid)
-            .get()
-            .then((d) {
-          Map<String, dynamic> userData = d.data();
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text, password: _passwordController.text
+      ).then((v) async {
+        if (v.user != null) {
+          id = v.user.uid;
+          email = v.user.email;
+          // name = v.user.displayName;
 
           if (Global.AdminEmail == v.user.email)
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => TeacherHome()));
+            role = UserRole.Admin.toString().split('.').last;
           else if (Global.EditorEmail == v.user.email)
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => TeacherHome()));
+            role = UserRole.Editor.toString().split('.').last;
           else
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => StudentHome()));
+            role = UserRole.Student.toString().split('.').last;
+
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString(UserData.role.toString().split('.').last, role);
+          prefs.setString(UserData.uid.toString().split('.').last, id);
+          prefs.setString(UserData.email.toString().split('.').last, email);
+
+          FirebaseFirestore.instance
+              .collection(role)
+              .doc(v.user.uid)
+              .get()
+              .then((d) {
+            Map<String, dynamic> userData = d.data();
+
+            if (Global.AdminEmail == v.user.email)
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => AdminHome()));
+            else if (Global.EditorEmail == v.user.email)
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => TeacherHome()));
+            else
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => StudentHome()));
+          });
+        }
+      });
+      setState(() {
+        isLoading = false;
+      });
+    } on PlatformException catch (e) {
+      if (e.code == 'firebase_auth') {
+        if(e.details['code'] == '"code" -> "user-not-found"'){
+          Fluttertoast.showToast(msg:'No user found for that email.');
+          setState(() {
+            isLoading = false;
+          });
+        }
+        else if (e.details['code'] == 'wrong-password') {
+          Fluttertoast.showToast(msg:'Wrong password provided for that user.');
+          setState(() {
+            isLoading = false;
+          });
+        }
+      }
+    }on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        Fluttertoast.showToast(msg:'No user found for that email.');
+        setState(() {
+          isLoading = false;
+        });
+      } else if (e.code == 'wrong-password') {
+        Fluttertoast.showToast(msg:'Wrong password provided for that user.');
+        setState(() {
+          isLoading = false;
         });
       }
-    });
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(UserData.role.toString().split('.').last, role);
-    prefs.setString(UserData.uid.toString().split('.').last, id);
-    // prefs.setString(UserData.name.toString().split('.').last, name);
-    prefs.setString(UserData.email.toString().split('.').last, email);
-    // prefs.setBool("IsLoggedIn", true);
-    //'name': _nameController.text,
-    //  'email': v.user.email,
+    }
   }
 
   Widget loginpage() {
@@ -120,119 +142,123 @@ class _LoginState extends State<Login> {
                   style: TextStyle(
                       fontSize:32.0,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent.withOpacity(1.0),
+                      color: Colors.white.withOpacity(1.0),
                   ),
                 ),
               ),
-            ), // logo title
-            Column(mainAxisSize: MainAxisSize.min, children: [
-              Container(
-                margin: EdgeInsets.all(5),
-
-                decoration: BoxDecoration(
-                  // //border: Border.all(width: 1, color: Colors.black),
-                  // borderRadius: BorderRadius.circular(10),
-                  color: Colors.white,
-                ),
-                child: TextFormField(
-                  cursorColor: Colors.amber,
-                  decoration: InputDecoration(
-                    enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey)),
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.amber)),
-                    contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                    border: InputBorder.none,
-                    hintText: 'user@quizcreator.com',
-                    hintStyle: TextStyle(fontSize: 16.0, color: Colors.amber),
-                    prefixIcon: Icon(
-                      Icons.email,
-                    ),
+            ),
+            SizedBox(height: 20),// logo title
+            Theme(
+              data: Theme.of(context)
+                  .copyWith(primaryColor: Colors.amber),
+              child: TextField(
+                cursorColor: Colors.amber,
+                decoration: InputDecoration(
+                  prefixStyle: TextStyle(color: Colors.amber),
+                  enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey)),
+                  focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.amber)),
+                  contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                  border: InputBorder.none,
+                  hintText: 'Email',
+                  hintStyle: TextStyle(fontSize: 16.0, color: Colors.amber),
+                  prefixIcon: Icon(
+                    Icons.email,
                   ),
-                  controller: _emailController,
                 ),
-              ), // email
-
-              Container(
-                margin: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                ),
-               child: TextFormField(
-                  cursorColor: Colors.amber,
-                  decoration: InputDecoration(
-                    enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey)),
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.amber)),
-                    hintText: '**********',
-                    hintStyle: TextStyle(fontSize: 16.0, color: Colors.amber),
-                    prefixIcon: Icon(Icons.lock),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          visiblelog = !visiblelog;
-                        });
-                        visiblelog == true
-                            ? Fluttertoast.showToast(
-                          msg: 'Password NOT visible',
+                controller: _emailController,
+              ),
+            ), // email
+            SizedBox(height: 20),
+            Theme(
+              data: Theme.of(context)
+                  .copyWith(primaryColor: Colors.amber),
+              child: TextField(
+                 cursorColor: Colors.amber,
+                 decoration: InputDecoration(
+                   enabledBorder: UnderlineInputBorder(
+                       borderSide: BorderSide(color: Colors.grey)),
+                   focusedBorder: UnderlineInputBorder(
+                       borderSide: BorderSide(color: Colors.amber)),
+                   hintText: '**********',
+                   hintStyle: TextStyle(fontSize: 16.0, color: Colors.amber),
+                   prefixIcon: Icon(Icons.lock),
+                   suffixIcon: GestureDetector(
+                     onTap: () {
+                       setState(() {
+                         visiblelog = !visiblelog;
+                       });
+                       visiblelog == true
+                           ? Fluttertoast.showToast(
+                         msg: 'Password NOT visible',
+                       )
+                           : Fluttertoast.showToast(
+                         msg: 'Password visible',
+                       );
+                     },
+                     child: visiblelog
+                         ? Icon(Icons.remove_red_eye_outlined)
+                         : Icon(Icons.remove_red_eye),
+                   ), ),
+                obscureText: visiblelog,
+                controller: _passwordController,),
+            ),
+            SizedBox(height: 20),
+            Row(children: [
+              Expanded(
+                  child: Container(
+                    color: Colors.amber,
+                    height: 50,
+                    child: ElevatedButton(
+                      // primary: Colors.amber, // background
+                        onPressed: () {
+                          if (_emailController.text.isEmpty && _passwordController.text.isEmpty) {
+                            return Fluttertoast.showToast(msg: 'Enter email & Password');
+                          }
+                          if (_emailController.text.isEmpty) {
+                            return Fluttertoast.showToast(msg: 'Please enter email');
+                          }
+                          else if (_passwordController.text.isEmpty) {
+                            Fluttertoast.showToast(msg: 'Please enter Password');
+                          }
+                          else if( !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(_emailController.text)) {
+                            return Fluttertoast.showToast(msg: ' NOT valid email Format');
+                          }
+                          else {
+                            authentication_login();
+                          }
+                        },
+                        child: !isLoading
+                            ?Text(
+                          "Login",
+                          style: TextStyle(fontSize: 22),
                         )
-                            : Fluttertoast.showToast(
-                          msg: 'Password visible',
-                        );
-                      },
-                      child: visiblelog
-                          ? Icon(Icons.remove_red_eye_outlined)
-                          : Icon(Icons.remove_red_eye),
-                    ), ),
-                 obscureText: visiblelog,
-                 controller: _passwordController,),
-
-              ), // password
-
-              Container(
-                height: 50,
-                width: 90,
-                decoration: BoxDecoration(
-                  color: Colors.amber,
-                  border: Border.all(width: 2, color: Colors.blueAccent),
-                  borderRadius: BorderRadius.circular(10),
-                ),//log in
-                child: GestureDetector(
-                  onTap: () {
-                    if (_emailController.text.isEmpty && _passwordController.text.isEmpty) {
-                      return Fluttertoast.showToast(msg: 'Enter email & Password');
-                    }
-                    if (_emailController.text.isEmpty) {
-                      return Fluttertoast.showToast(msg: 'Please enter email');
-                    }
-                    else if (_passwordController.text.isEmpty) {
-                      Fluttertoast.showToast(msg: 'Please enter Password');
-                    }
-                    else if( !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(_emailController.text)) {
-                      return Fluttertoast.showToast(msg: ' NOT valid email Format');
-                    }
-                    else {
-                      authentication_login();
-                    }
-                  },
-                  child: Center(
-                    child: Text(
-                      "LogIn",
-                      style: TextStyle(fontSize: 20.0 , color:Colors.blueAccent),
+                        :CircularProgressIndicator(
+                          backgroundColor: Colors.white,
+                          valueColor:
+                          new AlwaysStoppedAnimation<Color>(Colors.amber),
+                        ),
+                        style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.amber)
+                          // style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                          //       (Set<MaterialState> states) {
+                          //     if (states.contains(MaterialState.pressed))
+                          //       return Colors.amber;
+                          //     return null; // Use the component's default.
+                          //   },
+                          // )),
+                        )
                     ),
-                  ),
-                ),
-              ), //login button
-            ]),
+                  ))
+            ]),// password
+            SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-            Text("Don't Have an Account?"),
+            Text("Don't Have an Account?  "),
+
             InkWell(
               onTap: () {
-                CircularProgressIndicator();
-
                 setState(() {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => (signup())));
@@ -240,7 +266,7 @@ class _LoginState extends State<Login> {
                 // loginScreen = false;
               },
               child: Text(
-                "REGISTER",
+                "Register",
                 style: TextStyle(
                   fontSize: 18.0,
                   color: Colors.amber,

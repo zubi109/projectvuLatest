@@ -122,7 +122,7 @@ class _TeacherHomeState extends State<TeacherHome> {
           InkWell(
             child: Center(
               child: Text(
-                "Log out",
+                "Logout",
                 style: TextStyle(fontSize: 16.0, color: Colors.white),
               ),
             ),
@@ -138,66 +138,56 @@ class _TeacherHomeState extends State<TeacherHome> {
           ),
         ])
       ),
-      body: Column(
-        children: [
-
-          _isLoding == false
-              ? ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: quizzes == null ? 0 : quizzes.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Dismissible(
-                      // Show a red background as the item is swiped away.
-                      background: Container(color: Colors.red),
-                      key: UniqueKey(),
-                      onDismissed: (direction) {
-                        setState(() {
-                          // items.removeAt(index);
-                          DeleteQuiz(quizzes[index].Id);
-                        });
-                      },
-                      child: SizedBox(
-                        child: Container(
-//                                height: MediaQuery.of(context).size.height,
-                          width: MediaQuery.of(context).size.width,
-
-                          height: 30,
-                          margin: EdgeInsets.only(top: 2, left: 20, right: 20),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                          ),
-                          child: FlatButton(
-                            color: counter_for_Quiz_number % 2 == 0
-                                ? Colors.amber
-                                : Colors.white12, //color: Colors.white,
-                            splashColor: Colors.white,
-                            onPressed: () {
-                              setState(() {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => (ViewQuiz(
-                                            quizzes[index]))));
-                              });
-                            },
-                            child: Center(
-                              child: Text(
-                                quizzes[index].Title,
-                                style: TextStyle(
-                                    fontSize: 20.0, color: Colors.black54),
-                              ),
-                            ),
+      body: _isLoding == false
+          ? ListView.builder(
+              shrinkWrap: true,
+              itemCount: quizzes == null ? 0 : quizzes.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Dismissible(
+                  // Show a red background as the item is swiped away.
+                  background: Container(color: Colors.red),
+                  key: UniqueKey(),
+                  onDismissed: (direction) {
+                    setState(() {
+                      // items.removeAt(index);
+                      DeleteQuiz(quizzes[index].Id);
+                    });
+                  },
+                  child: Card(
+                    child: ListTile(
+                      title: FlatButton(
+                        color: counter_for_Quiz_number % 2 == 0
+                            ? Colors.amber
+                            : Colors.white12, //color: Colors.white,
+                        splashColor: Colors.white,
+                        onPressed: () {
+                          setState(() {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => (ViewQuiz(
+                                        quizzes[index]))));
+                          });
+                        },
+                        child: Center(
+                          child: Text(
+                            quizzes[index].Title,
+                            style: TextStyle(
+                                fontSize: 20.0, color: Colors.black54),
                           ),
                         ),
                       ),
-                    );
-                  })
-              : Center(
-                  child: CircularProgressIndicator(),
-                ),
-        ],
-      ),
+                    ),
+                  ),
+                );
+              })
+          : Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.amber,
+                valueColor:
+                new AlwaysStoppedAnimation<Color>(Colors.white54),
+              ),
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
