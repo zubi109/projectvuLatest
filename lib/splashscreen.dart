@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:projectvu/student/StudentHome.dart';
-import 'package:projectvu/student/student_home_page.dart';
 import 'package:projectvu/utilities/UserData.dart';
 import 'package:projectvu/utilities/UserRole.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,7 +12,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'Authentication/Login.dart';
 import 'admin/admin_unverified_account.dart';
 import 'teacher/teacher_home.dart';
-import 'utilities/user_model.dart';
 
 class splashScreenclass extends StatefulWidget {
   //

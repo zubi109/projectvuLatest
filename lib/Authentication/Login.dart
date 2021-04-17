@@ -9,7 +9,6 @@ import 'package:projectvu/teacher/teacher_home.dart';
 import 'package:projectvu/utilities/GlobalProperties.dart';
 import 'package:projectvu/utilities/UserData.dart';
 import 'package:projectvu/utilities/UserRole.dart';
-import 'package:projectvu/utilities/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Signup.dart';
@@ -29,6 +28,10 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+      foregroundColor: Colors.amber,
+        title: Text(''),
+      ),
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -37,7 +40,10 @@ class _LoginState extends State<Login> {
         child: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          child: loginpage(),
+          child: Card(
+          margin: EdgeInsets.all(20),
+              child: loginpage()
+          ),
         ),
       ),
     );
@@ -191,15 +197,22 @@ class _LoginState extends State<Login> {
                   color: Colors.amber,
                   border: Border.all(width: 2, color: Colors.blueAccent),
                   borderRadius: BorderRadius.circular(10),
-                ),
+                ),//log in
                 child: GestureDetector(
                   onTap: () {
-                    if (_emailController.text.isEmpty) {
-                      Fluttertoast.showToast(msg: 'Please enter email');
+                    if (_emailController.text.isEmpty && _passwordController.text.isEmpty) {
+                      return Fluttertoast.showToast(msg: 'Enter email & Password');
                     }
-                    if (_passwordController.text.isEmpty) {
+                    if (_emailController.text.isEmpty) {
+                      return Fluttertoast.showToast(msg: 'Please enter email');
+                    }
+                    else if (_passwordController.text.isEmpty) {
                       Fluttertoast.showToast(msg: 'Please enter Password');
-                    } else {
+                    }
+                    else if( !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(_emailController.text)) {
+                      return Fluttertoast.showToast(msg: ' NOT valid email Format');
+                    }
+                    else {
                       authentication_login();
                     }
                   },
@@ -218,6 +231,8 @@ class _LoginState extends State<Login> {
             Text("Don't Have an Account?"),
             InkWell(
               onTap: () {
+                CircularProgressIndicator();
+
                 setState(() {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => (signup())));

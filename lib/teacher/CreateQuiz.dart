@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:projectvu/models/question.dart';
@@ -76,144 +77,136 @@ class _CreateQuizState extends State<CreateQuiz> {
               ),
             )
           : Center(
-            child: SingleChildScrollView(
+            child: Card(
+              margin: EdgeInsets.only(left: 20 , right: 20),
+              child: SingleChildScrollView(
         physics: AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-              child: Container(
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      TextFormField(
-                        cursorColor: Colors.amber,
-                        keyboardType: TextInputType.text,
-                        decoration: InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey)),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.amber)),
+                child: Container(
+                    padding: EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextFormField(
+                          cursorColor: Colors.amber,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey)),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.amber)),
 
-                          hintText: 'Quiz Name',
-                        ),
-                        controller: _nameController,
-                      ), //
-                      SizedBox(
-                        height: 20,
-                      ),
-                      TextFormField(
-                        cursorColor: Colors.amber,
-                        decoration: InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey)),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.amber)),
-                          hintText: 'Description',
-                        ),
-                        controller: _descriptionController,
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      TextFormField(
-                        cursorColor: Colors.amber,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey)),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.amber)),
-                          hintText: 'No. of Questions',
-                        ),
-                        controller: _numberofQuestionController,
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      TextFormField(
-                        cursorColor: Colors.amber,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey)),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.amber)),
-                          hintText: 'Time Limit (seconds)',
-                        ),
-                        controller: _timeLimitController,
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      TextFormField(
-                        cursorColor: Colors.amber,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey)),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.amber)),
-                          hintText: 'Allowed Attempts',
-                        ),
-                        controller: _attemptsCountController,
-                      ), // Enter Quiz Name
-                      SizedBox(
-                        height: 20,
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      //Spacer(),
-                      Row(children: [
-                        Expanded(
-                            child: Container(
-                              color: Colors.amber,
-                          height: 50,
-                          child: ElevatedButton(
-                           // primary: Colors.amber, // background
-                            onPressed: () {
-                              if(_nameController.text.isEmpty){
-                                return Fluttertoast.showToast(msg: 'Pleas Enter Quiz Name');
-                              }
-                              else if(_descriptionController.text.isEmpty){
-                                return Fluttertoast.showToast(msg: 'Pleas Enter Quiz Descriptions');
-                              }
-                              else if(_numberofQuestionController.text.isEmpty){
-                                return Fluttertoast.showToast(msg: 'Pleas Enter Number of Question');
-                              }
-                              else if(_timeLimitController.text.isEmpty){
-                                return Fluttertoast.showToast(msg: 'Pleas Enter Quiz Time Limit in Seconds');
-                              }
-                              else if(_attemptsCountController.text.isEmpty){
-                                return Fluttertoast.showToast(msg: 'Pleas write Quiz Name');
-                              }
-                              else{
-                                createQuizeline();
-                              }
-
-                            },
-                            child: Text(
-                              "Next",
-                              style: TextStyle(fontSize: 22),
-                            ),
-                            style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.amber)
-                            // style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                            //       (Set<MaterialState> states) {
-                            //     if (states.contains(MaterialState.pressed))
-                            //       return Colors.amber;
-                            //     return null; // Use the component's default.
-                            //   },
-                            // )),
-                            )
+                            hintText: 'Quiz Name',
                           ),
-                        ))
-                      ]),
-                    ],
+                          controller: _nameController,
+                        ), //quiz name
+                        SizedBox(
+                          height: 20,
+                        ),
+                        TextFormField(
+                          cursorColor: Colors.amber,
+                          // keyboardType: TextInputType.number,
+                          keyboardType: TextInputType.numberWithOptions(
+                            decimal: true,
+                            signed: false,
+                          ),
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey)),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.amber)),
+                            hintText: 'No. of Questions',
+                           // keyboardType: TextInputType.numberWithOptions(decimal: true),
+
+                          ),
+                          controller: _numberofQuestionController,
+                        ),//number of qestion
+                        SizedBox(
+                          height: 20,
+                        ),
+                        TextFormField(
+                          cursorColor: Colors.amber,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey)),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.amber)),
+                            hintText: 'Time Limit (seconds)',
+                          ),
+                          controller: _timeLimitController,
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        TextFormField(
+                          cursorColor: Colors.amber,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey)),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.amber)),
+                            hintText: 'Allowed Attempts',
+                          ),
+                          controller: _attemptsCountController,
+                        ), // Enter Quiz Name
+                        SizedBox(
+                          height: 20,
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        //Spacer(),
+                        Row(children: [
+                          Expanded(
+                              child: Container(
+                                color: Colors.amber,
+                            height: 50,
+                            child: ElevatedButton(
+                             // primary: Colors.amber, // background
+                              onPressed: () {
+                                if(_nameController.text.isEmpty){
+                                  return Fluttertoast.showToast(msg: 'Pleas Enter Quiz Name');
+                                }
+                                else if(_numberofQuestionController.text.isEmpty){
+                                  return Fluttertoast.showToast(msg: 'Pleas Enter Number of Question');
+                                }
+                                else if(_timeLimitController.text.isEmpty){
+                                  return Fluttertoast.showToast(msg: 'Pleas Enter Quiz Time Limit in Seconds');
+                                }
+                                else if(_attemptsCountController.text.isEmpty){
+                                  return Fluttertoast.showToast(msg: 'Pleas write Quiz Name');
+                                }
+                                else{
+                                  createQuizeline();
+                                }
+
+                              },
+                              child: Text(
+                                "Next",
+                                style: TextStyle(fontSize: 22),
+                              ),
+                              style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.amber)
+                              // style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                              //       (Set<MaterialState> states) {
+                              //     if (states.contains(MaterialState.pressed))
+                              //       return Colors.amber;
+                              //     return null; // Use the component's default.
+                              //   },
+                              // )),
+                              )
+                            ),
+                          ))
+                        ]),
+                      ],
+                    ),
                   ),
-                ),
+              ),
             ),
           ),
     );

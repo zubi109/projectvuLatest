@@ -1,11 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:projectvu/models/question.dart';
 import 'package:projectvu/models/quiz.dart';
-import 'package:projectvu/student/student_home_page.dart';
-import 'package:projectvu/teacher/teacher_home.dart';
 import 'package:projectvu/utilities/QuestionType.dart';
+import 'package:projectvu/utilities/UserData.dart';
+import 'package:projectvu/utilities/UserRole.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ViewQuiz extends StatefulWidget {
   Quiz quiz;
@@ -19,6 +19,7 @@ class ViewQuiz extends StatefulWidget {
 class _ViewQuizState extends State<ViewQuiz> {
   var currenindex = 0;
   var quizlength = 0;
+  String role;
 
   List<Question> questions = [];
 
@@ -30,6 +31,7 @@ class _ViewQuizState extends State<ViewQuiz> {
   }
 
   void initData() async {
+    var pref = await SharedPreferences.getInstance();
     var snap = await FirebaseFirestore.instance
         .collection("Questions")
         .where('QuizId', isEqualTo: widget.quiz.Id)
@@ -39,6 +41,7 @@ class _ViewQuizState extends State<ViewQuiz> {
       list.add(Question.fromJson(item.data()));
     }
     setState(() {
+      role = pref.getString(UserData.role.toString().split(".").last);
       questions = list;
     });
   }
@@ -61,7 +64,11 @@ class _ViewQuizState extends State<ViewQuiz> {
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.all(9),
-      margin: EdgeInsets.only(left: 8, right: 8, top: 22,),
+      margin: EdgeInsets.only(
+        left: 8,
+        right: 8,
+        top: 22,
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -79,16 +86,7 @@ class _ViewQuizState extends State<ViewQuiz> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Title: ",
-                            style: TextStyle(fontSize: 36,fontWeight: FontWeight.bold,color: Colors .amber)),
                         Text("${widget.quiz.Title}"),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Description: ",
-                            style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors .amber)),                        Text("${widget.quiz.Description}"),
                       ],
                     ),
                     Row(
@@ -96,12 +94,18 @@ class _ViewQuizState extends State<ViewQuiz> {
                       children: [
                         Row(children: [
                           Text("Time Limit: ",
-                              style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors .amber)),
-                          Text("${widget.quiz.TimeLimit}s"),
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.amber)), //time
+                          Text("${widget.quiz.TimeLimit}"),
                         ]),
                         Row(children: [
                           Text("Total Marks: ",
-                              style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors .amber)),
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.amber)),
                           Text("${widget.quiz.TotalMarks}"),
                         ]),
                       ],
@@ -111,12 +115,21 @@ class _ViewQuizState extends State<ViewQuiz> {
                       children: [
                         Row(children: [
                           Text("No. of Questions: ",
-                              style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors .amber)),                          Text("${widget.quiz.NOQ}"),
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.amber)),
+                          Text("${widget.quiz.NOQ}"),
                         ]),
                         Row(children: [
                           Text("Attempts Limit: ",
-                              style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors .amber)),
-                          Text(widget.quiz.AttemptsCount == null ? "0" : widget.quiz.AttemptsCount.toString()),
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.amber)),
+                          Text(widget.quiz.AttemptsCount == null
+                              ? "0"
+                              : widget.quiz.AttemptsCount.toString()),
                         ]),
                       ],
                     ),
@@ -151,18 +164,26 @@ class _ViewQuizState extends State<ViewQuiz> {
         children: [
           // Text(data["question"]),
           ListTile(
-            title: Text('Q: ' + question.title,
-            style: TextStyle(color: Colors.amber),),
-          ),
+            title: Text(
+              'Q: ' + question.title,
+              style: TextStyle(color: Colors.amber),
+            ),
+          ), //Question
+          // SharedPreferences prefs = await SharedPreferences.getInstance();
+          // prefs.getString(UserData.role.toString().split('.').last);
+          // //role = UserRole.Student.toString().split('.').last;
+
           ListTile(
-            title: Text('Answer: ' + question.answer),
-          ),
+            title: role == UserRole.Student.toString().split(".").last
+                ? SizedBox()
+                : Text('Answer: ' + question.answer),
+          ), //Answer
           ListTile(
             title: Text('Question Type: ' + question.type),
-          ),
+          ), //question type
           ListTile(
             title: Text('Marks: ' + question.marks.toString()),
-          ),
+          ), //marks
           question.type == QuestionType.MCQ.toString().split('.').last
               ? Column(
                   children: [
@@ -179,7 +200,7 @@ class _ViewQuizState extends State<ViewQuiz> {
                       title: Text('Option4: ' + question.option4),
                     ),
                   ],
-                )
+                ) //mcq options
               : SizedBox()
         ],
       ),

@@ -8,7 +8,6 @@ import 'package:projectvu/models/question.dart';
 import 'package:projectvu/models/quiz.dart';
 import 'package:projectvu/teacher/teacher_home.dart';
 import 'package:projectvu/utilities/QuestionType.dart';
-import 'package:projectvu/utilities/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -322,7 +321,6 @@ setState(() {
       return SizedBox();
     }
   }
-
   Widget question() {
     return Container(
       height: 90,
@@ -362,7 +360,6 @@ setState(() {
       ),
     );
   }
-
   Widget radio_Buttonoption(){
     return Column(
       children: <Widget>[

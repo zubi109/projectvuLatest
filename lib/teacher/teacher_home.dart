@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:projectvu/Authentication/Login.dart';
+import 'package:projectvu/models/question.dart';
+import 'package:projectvu/models/question.dart';
+import 'package:projectvu/models/question.dart';
 import 'package:projectvu/models/quiz.dart';
 import 'package:projectvu/teacher/CreateQuestion.dart';
 import 'package:projectvu/utilities/UserData.dart';
@@ -24,36 +27,17 @@ class TeacherHome extends StatefulWidget {
 }
 
 class _TeacherHomeState extends State<TeacherHome> {
-  TextEditingController _subjectController = TextEditingController();
+
   bool _isLoding = false;
   List<Quiz> quizzes = [];
-  final _formKey = GlobalKey<FormState>();
-  String quizId, quizename;
-  DatabaseService databaseService = new DatabaseService();
+  List<Question> questions = [];
+  // final _formKey = GlobalKey<FormState>();
+  // String quizId, quizename;
+  // DatabaseService databaseService = new DatabaseService();
 
   int counter_for_Quiz_number = 1;
-  bool color_selection_quiz_tile = true;
+//  bool color_selection_quiz_tile = true;
 
-  // QuerySnapshot snapData;
-
-  // createQuizeline() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   if (_formKey.currentState.validate()) {
-  //     quizId = randomAlphaNumeric(16);
-  //
-  //     FirebaseFirestore.instance.collection('Quiz').doc(quizId).set({
-  //       "quizId": quizId,
-  //       "teacherid": prefs.getString("teacherid"),
-  //       "tilte": _subjectController.text
-  //     }).then((value) {
-  //       setState(() {
-  //         _isLoding = false;
-  //         Navigator.pushReplacement(context,
-  //             MaterialPageRoute(builder: (context) => CreateQuestion(quizId)));
-  //       });
-  //     });
-  //   }
-  // }
 
   @override
   void initState() {
@@ -84,7 +68,16 @@ class _TeacherHomeState extends State<TeacherHome> {
     await FirebaseFirestore.instance
         .collection("Quizzes")
         .doc(reference)
-        .delete();
+        .delete().then((value) async {
+      var queSnap = await FirebaseFirestore.instance
+          .collection("Questions")
+          .where('QuizId',isEqualTo: reference).get();
+      for (var item in queSnap.docs) {
+        var que = Quiz.fromJson(item.data());
+        await FirebaseFirestore.instance
+            .collection("Questions").doc(que.Id).delete();
+      }
+    });
     var snap = await FirebaseFirestore.instance.collection("Quizzes").get();
     List<Quiz> list = [];
     for (var item in snap.docs) {
@@ -92,6 +85,26 @@ class _TeacherHomeState extends State<TeacherHome> {
     }
     setState(() {
       quizzes = list;
+      _isLoding = false;
+    });
+  }
+
+  void DeleteQuestion(String reference) async {
+    setState(() {
+      _isLoding = true;
+    });
+
+    await FirebaseFirestore.instance
+        .collection("Question")
+        .doc(reference)
+        .delete();
+    var snap = await FirebaseFirestore.instance.collection("Questions").get();
+    List<Quiz> list = [];
+    for (var item in snap.docs) {
+      //list.add(Question.fromJson(item.data()));
+    }
+    setState(() {
+      questions = list.cast<Question>();
       _isLoding = false;
     });
   }
@@ -109,7 +122,7 @@ class _TeacherHomeState extends State<TeacherHome> {
           InkWell(
             child: Center(
               child: Text(
-                "Sign_out",
+                "Log out",
                 style: TextStyle(fontSize: 16.0, color: Colors.white),
               ),
             ),

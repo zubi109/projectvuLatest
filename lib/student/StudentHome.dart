@@ -8,7 +8,6 @@ import 'package:projectvu/models/attempt.dart';
 import 'package:projectvu/models/quiz.dart';
 import 'package:projectvu/providers/AttemptProvider.dart';
 import 'package:projectvu/student/AttemptQuiz.dart';
-import 'package:projectvu/student/attempt_quize.dart';
 import 'package:projectvu/teacher/CreateQuestion.dart';
 import 'package:projectvu/teacher/CreateQuiz.dart';
 import 'package:projectvu/teacher/ViewQuiz.dart';

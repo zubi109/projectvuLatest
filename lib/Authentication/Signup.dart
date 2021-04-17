@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:projectvu/Authentication/Login.dart';
 import 'package:projectvu/admin/admin_unverified_account.dart';
 import 'package:projectvu/models/User.dart';
-import 'package:projectvu/student/student_home_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class signup extends StatefulWidget {
   @override
@@ -42,7 +41,7 @@ class _signupState extends State<signup> {
         child: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          child: signUpFields(),
+          child: Card(child: signUpFields()),
         ),
       ),
     );
@@ -51,17 +50,31 @@ class _signupState extends State<signup> {
 
   Future<void> authenticationsignup() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    if (_passwordController.text == _confPassController.text) {
-      await auth.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      )
-          .then((v) async {
-        if (v.user != null) {
-          studentDataEnter(v);
+
+    try {
+      if (_passwordController.text == _confPassController.text) {
+        await auth.createUserWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
+        )
+            .then((v) async {
+          if (v.user != null) {
+            studentDataEnter(v);
+          }
+        });
+      }
+    } catch(signUpError) {
+      if(signUpError is PlatformException) {
+        if(signUpError.code == 'ERROR_EMAIL_ALREADY_IN_USE') {
+          /// `foo@bar.com` has alread been registered.
         }
-      });
+      }
     }
+
+
+
+
+
   }
 
   void studentDataEnter(v) {
@@ -246,33 +259,29 @@ class _signupState extends State<signup> {
             ),
           ),
           onTap: () {
-            if (_fullnameController.text.isEmpty)
+            if (_fullnameController.text.isEmpty&&_emailController.text.isEmpty&&_passwordController.text.isEmpty&&_confPassController.text.isEmpty)
               return Fluttertoast.showToast(
-                  msg: "Pleass Enter Your name");
-            if (_emailController.text.isEmpty)
+                  msg: "All fields Empty ");
+            else if (_fullnameController.text.isEmpty)
               return Fluttertoast.showToast(
-                  msg: "Pleass Enter Email");
-            if (_passwordController.text.isEmpty)
+                  msg: "Please Enter Your name");
+            else if( !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(_emailController.text))
               return Fluttertoast.showToast(
-                  msg: "Pleass Enter Password");
-            if (_confPassController.text.isEmpty)
+                  msg: ' NOT valid email Format');
+           else if (_emailController.text.isEmpty)
               return Fluttertoast.showToast(
-                  msg: "Pleass Enter confirm Password");
-            if (_passwordController.text != _confPassController.text)
+                  msg: "Please Enter Email");
+            else if (_passwordController.text.isEmpty)
+              return Fluttertoast.showToast(
+                  msg: "Please Enter Password");
+            else if (_confPassController.text.isEmpty)
+              return Fluttertoast.showToast(
+                  msg: "Please Enter confirm Password");
+            else if (_passwordController.text != _confPassController.text)
               return Fluttertoast.showToast(
                   msg: "Confirm Password not match");
-            // if (_passwordController.text != _confPassController.text)
-            //   return Fluttertoast.showToast(
-            //       msg: "Pleass check Your Password");
-            // if (_programController.text.isEmpty)
-            //   return Fluttertoast.showToast(
-            //       msg: "Pleass Enter Your Password");
-            // if (_semesterController.text.isEmpty)
-            //   return Fluttertoast.showToast(
-            //       msg: "Pleass Select Your Semester");
-            authenticationsignup();
+            else{authenticationsignup();}
           },
-
         ),
 
         Row(
