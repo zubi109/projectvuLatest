@@ -8,6 +8,8 @@ import 'package:projectvu/utilities/QuestionType.dart';
 import 'package:projectvu/utilities/UserData.dart';
 import 'package:projectvu/utilities/UserRole.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
+
 
 class ViewResult extends StatefulWidget {
   Quiz quiz;
@@ -27,6 +29,7 @@ class _ViewResultState extends State<ViewResult> {
   List<Answer> answers = [];
   Attempt attempt;
   int attemptCount;
+  bool isLoading;
 
   @override
   void initState() {
@@ -36,6 +39,9 @@ class _ViewResultState extends State<ViewResult> {
   }
 
   void initData() async {
+    setState(() {
+      isLoading = true;
+    });
     var pref = await SharedPreferences.getInstance();
     var stuId = pref.getString(UserData.uid.toString().split(".").last);
 
@@ -51,8 +57,7 @@ class _ViewResultState extends State<ViewResult> {
     var attSnap = await FirebaseFirestore.instance
         .collection("Attempts")
         .where('QuizId', isEqualTo: widget.quiz.Id)
-        .where('StuId', isEqualTo: stuId)
-        .orderBy("TimeStamp",descending: true)
+        .where('StudentId', isEqualTo: stuId)
         .get();
     List<Attempt> attList = [];
     for (var item in attSnap.docs) {
@@ -62,7 +67,8 @@ class _ViewResultState extends State<ViewResult> {
     setState(() {
       role = pref.getString(UserData.role.toString().split(".").last);
       questions = qlist;
-      attempt = attList.first;
+      attList.sort((a, b) => a.timeStamp.compareTo(b.timeStamp));
+      attempt = attList.last;
       attemptCount = attList.length;
     });
 
@@ -77,6 +83,7 @@ class _ViewResultState extends State<ViewResult> {
 
     setState(() {
       answers = ansList;
+      isLoading = false;
     });
   }
 
@@ -85,11 +92,19 @@ class _ViewResultState extends State<ViewResult> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.amber,
-        title: const Text('Quiz View'),
+        title: const Text('Quiz Result'),
       ),
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      body: boddy(),
+      body: !isLoading
+          ?boddy()
+          :Center(
+        child: CircularProgressIndicator(
+          backgroundColor: Colors.amber,
+          valueColor:
+          new AlwaysStoppedAnimation<Color>(Colors.white54),
+        ),
+      ),
     );
   }
 
@@ -127,20 +142,20 @@ class _ViewResultState extends State<ViewResult> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Row(children: [
-                          Text("Time Limit: ",
+                          Text("Time Taken: ",
                               style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.amber)), //time
-                          Text("${widget.quiz.TimeLimit}"),
+                          Text("${DateFormat("HH:mm:ss").format(DateTime(2021, 0, 0, 0, 0, attempt.timeTaken, 0))}"),
                         ]),
                         Row(children: [
-                          Text("Total Marks: ",
+                          Text("Obtained Marks: ",
                               style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.amber)),
-                          Text("${widget.quiz.TotalMarks}"),
+                          Text("${attempt.marks}/${widget.quiz.TotalMarks}"),
                         ]),
                       ],
                     ),
@@ -156,14 +171,14 @@ class _ViewResultState extends State<ViewResult> {
                           Text("${widget.quiz.NOQ}"),
                         ]),
                         Row(children: [
-                          Text("Attempts Limit: ",
+                          Text("Attempts Count: ",
                               style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.amber)),
-                          Text(widget.quiz.AttemptsCount == null
-                              ? "0"
-                              : widget.quiz.AttemptsCount.toString()),
+                          Text(attemptCount == null
+                              ? "0/" + widget.quiz.AttemptsCount.toString()
+                              : attemptCount.toString() + "/" + widget.quiz.AttemptsCount.toString()),
                         ]),
                       ],
                     ),
@@ -206,17 +221,11 @@ class _ViewResultState extends State<ViewResult> {
           // prefs.getString(UserData.role.toString().split('.').last);
           // //role = UserRole.Student.toString().split('.').last;
 
-          ListTile(
-            title: role == UserRole.Student.toString().split(".").last
-                ? SizedBox()
-                : Text('Answer: ' + question.answer),
-          ), //Answer
+          getAnswer(question), //Answer
           ListTile(
             title: Text('Question Type: ' + question.type),
           ), //question type
-          ListTile(
-            title: Text('Marks: ' + question.marks.toString()),
-          ), //marks
+          getObtainedMarks(question), //marks
           question.type == QuestionType.MCQ.toString().split('.').last
               ? Column(
                   children: [
@@ -240,6 +249,20 @@ class _ViewResultState extends State<ViewResult> {
     );
   }
 
+  Widget getAnswer(Question question){
+    var ans = answers.where((element) => element.questionId == question.id).first;
+    return ListTile(
+         title : ans.text != null ?Text('Answer: ' + ans.text) : Text('Answer: '),
+      subtitle: ans.text == question.answer ?Text('Correct', style: TextStyle(color: Colors.green)) :Text('Wrong', style: TextStyle(color: Colors.red)),
+    );
+  }
+
+  Widget getObtainedMarks(Question question){
+    var ans = answers.where((element) => element.questionId == question.id).first;
+    return ListTile(
+      title : Text('${ans.marks}/${question.marks}'),
+    );
+  }
 // void getSubjects(){
 //
 //   FirebaseFirestore.instance.collection("Quiz").doc("c++").collection("quiz 1").doc().get().then((value){

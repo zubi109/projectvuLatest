@@ -8,6 +8,7 @@ import 'package:projectvu/models/attempt.dart';
 import 'package:projectvu/models/quiz.dart';
 import 'package:projectvu/providers/AttemptProvider.dart';
 import 'package:projectvu/student/AttemptQuiz.dart';
+import 'package:projectvu/student/ViewResult.dart';
 import 'package:projectvu/teacher/CreateQuestion.dart';
 import 'package:projectvu/teacher/CreateQuiz.dart';
 import 'package:projectvu/teacher/ViewQuiz.dart';
@@ -219,7 +220,9 @@ class _StudentHomeState extends State<StudentHome> {
                                   fontSize: 16.0, color: Colors.amber),
                             ),
                           ),
-                          onTap: () async {},
+                          onTap: () {
+                            initViewResult(quizzes[index]);
+                          },
                         ),
                       ],
                     )
@@ -236,6 +239,39 @@ class _StudentHomeState extends State<StudentHome> {
             ),
           ),
     );
+  }
+
+  initViewResult(Quiz quiz) async{
+    setState(() {
+      _isLoding = true;
+    });
+
+    var pref = await SharedPreferences.getInstance();
+    var stuId = pref.getString(UserData.uid.toString().split(".").last);
+
+    var attSnap = await FirebaseFirestore.instance
+        .collection("Attempts")
+        .where('QuizId', isEqualTo: quiz.Id)
+        .where('StudentId', isEqualTo: stuId)
+        .get();
+    List<Attempt> attList = [];
+    for (var item in attSnap.docs) {
+      attList.add(Attempt.fromJson(item.data()));
+    }
+
+    if(attList.length == 0){
+      Fluttertoast.showToast(msg: "You have not attempted this quiz yet!");
+    }
+    else{
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+              (ViewResult(quiz))));
+    }
+    setState(() {
+      _isLoding = false;
+    });
   }
 
   Future<void> _showMyDialog(Quiz que) async {

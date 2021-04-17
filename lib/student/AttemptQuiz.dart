@@ -174,7 +174,7 @@ class _AttemptQuizState extends State<AttemptQuiz> {
                 padding: EdgeInsets.symmetric(horizontal: 0, vertical: 45),
                 child: Container(
                   child: Column(children: [
-                    Text("Time Left: " + DateFormat("H:m:s").format(time)),
+                    Text("Time Left: " + DateFormat("HH:mm:ss").format(time)),
                     question(questions[counter - 1]),
                     setAnswers(questions[counter - 1]),
                     counter != newQuiz.NOQ
@@ -596,12 +596,17 @@ class _AttemptQuizState extends State<AttemptQuiz> {
     var remTime = context.read<AttemptProvider>().RemainingTime;
     var quiz = context.read<AttemptProvider>().quiz;
     var uuid = Uuid();
+
     Answer ans = new Answer(
         id: uuid.v4(),
         marks: que.answer == givenAnswer ? que.marks : 0,
         text: givenAnswer,
         questionId: que.id,
         attemptId: attempt.id);
+    if (que.type == QuestionType.ShortQuestion.toString().split(".").last) {
+      ans.text = _shortquestionController.text;
+      ans.marks = que.answer == ans.text ? que.marks : 0;
+    }
     attempt.marks += ans.marks;
     attempt.timeStamp = DateTime.now().toString();
     attempt.timeTaken = quiz.TimeLimit - remTime;
