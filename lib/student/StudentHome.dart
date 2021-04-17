@@ -103,6 +103,7 @@ class _StudentHomeState extends State<StudentHome> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var stuId = pref.getString(UserData.uid.toString().split(".").last);
     context.read<AttemptProvider>().Counter = 1;
+    context.read<AttemptProvider>().Answers = [];
     var uuid = Uuid();
     Attempt attempt = new Attempt(
       id: uuid.v4(),
@@ -113,13 +114,16 @@ class _StudentHomeState extends State<StudentHome> {
       timeStamp: DateTime.now().toString(),
     );
     var data = attempt.toJson();
-    FirebaseFirestore.instance
+
+    await FirebaseFirestore.instance
         .collection("Attempts")
-        .doc(uuid.v4())
+        .doc(attempt.id)
         .set(data)
         .then((value) {
       context.read<AttemptProvider>().attempt = attempt;
       context.read<AttemptProvider>().getQuestions();
+      context.read<AttemptProvider>().AttemptQuizLoading = false;
+      context.read<AttemptProvider>().startTimer();
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (context) => AttemptQuiz(),
@@ -160,83 +164,77 @@ class _StudentHomeState extends State<StudentHome> {
               },
             ),
           ])),
-      body: Column(
-        children: [
-          _isLoding == false
-              ? ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: quizzes == null ? 0 : quizzes.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Card(
-                      child: Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Column(
-                          children: [
-                            Text(
-                              quizzes[index].Title,
-                              style: TextStyle(
-                                  fontSize: 20.0, color: Colors.black54),
-                            ),
-                            SizedBox(height: 20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                InkWell(
-                                  child: Center(
-                                    child: Text(
-                                      "View Quiz",
-                                      style: TextStyle(
-                                          fontSize: 16.0, color: Colors.amber),
-                                    ),
-                                  ),
-                                  onTap: () async {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                (ViewQuiz(quizzes[index]))));
-                                  },
-                                ),
-                                InkWell(
-                                  child: Center(
-                                    child: Text(
-                                      "Attempt",
-                                      style: TextStyle(
-                                          fontSize: 16.0, color: Colors.amber),
-                                    ),
-                                  ),
-                                  onTap: () async {
-                                    attemptQuiz(quizzes[index]);
-                                  },
-                                ),
-                                InkWell(
-                                  child: Center(
-                                    child: Text(
-                                      "View Result",
-                                      style: TextStyle(
-                                          fontSize: 16.0, color: Colors.amber),
-                                    ),
-                                  ),
-                                  onTap: () async {},
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                    );
-                  })
-              : Expanded(
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      backgroundColor: Colors.amber,
-                      valueColor:
-                          new AlwaysStoppedAnimation<Color>(Colors.white54),
+      body: _isLoding == false
+          ? ListView.builder(
+          shrinkWrap: true,
+          itemCount: quizzes == null ? 0 : quizzes.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Card(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    Text(
+                      quizzes[index].Title,
+                      style: TextStyle(
+                          fontSize: 20.0, color: Colors.black54),
                     ),
-                  ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        InkWell(
+                          child: Center(
+                            child: Text(
+                              "View Quiz",
+                              style: TextStyle(
+                                  fontSize: 16.0, color: Colors.amber),
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                    (ViewQuiz(quizzes[index]))));
+                          },
+                        ),
+                        InkWell(
+                          child: Center(
+                            child: Text(
+                              "Attempt",
+                              style: TextStyle(
+                                  fontSize: 16.0, color: Colors.amber),
+                            ),
+                          ),
+                          onTap: () async {
+                            await attemptQuiz(quizzes[index]);
+                          },
+                        ),
+                        InkWell(
+                          child: Center(
+                            child: Text(
+                              "View Result",
+                              style: TextStyle(
+                                  fontSize: 16.0, color: Colors.amber),
+                            ),
+                          ),
+                          onTap: () async {},
+                        ),
+                      ],
+                    )
+                  ],
                 ),
-        ],
-      ),
+              ),
+            );
+          })
+          : Center(
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.amber,
+              valueColor:
+              new AlwaysStoppedAnimation<Color>(Colors.white54),
+            ),
+          ),
     );
   }
 

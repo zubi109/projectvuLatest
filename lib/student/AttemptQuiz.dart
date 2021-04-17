@@ -1,19 +1,16 @@
 import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:projectvu/models/answer.dart';
 import 'package:projectvu/models/question.dart';
-import 'package:projectvu/models/quiz.dart';
 import 'package:projectvu/providers/AttemptProvider.dart';
 import 'package:projectvu/student/StudentHome.dart';
-import 'package:projectvu/teacher/teacher_home.dart';
 import 'package:projectvu/utilities/QuestionType.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class AttemptQuiz extends StatefulWidget {
   AttemptQuiz() {}
@@ -41,10 +38,14 @@ class _AttemptQuizState extends State<AttemptQuiz> {
   }
 
   TextEditingController _questionController = TextEditingController();
-  TextEditingController _option1Controller = TextEditingController();
-  TextEditingController _option2Controller = TextEditingController(text: "option2");
-  TextEditingController _option3Controller = TextEditingController(text: "option3");
-  TextEditingController _option4Controller = TextEditingController(text: "option4");
+  TextEditingController _option1Controller =
+      TextEditingController(text: "option1");
+  TextEditingController _option2Controller =
+      TextEditingController(text: "option2");
+  TextEditingController _option3Controller =
+      TextEditingController(text: "option3");
+  TextEditingController _option4Controller =
+      TextEditingController(text: "option4");
   TextEditingController _questionMarksController = TextEditingController();
   TextEditingController _shortquestionController = TextEditingController();
 
@@ -69,32 +70,71 @@ class _AttemptQuizState extends State<AttemptQuiz> {
   createQuizeline() {
     // asses the Quiz Model
     Question(
+      //  id: ,
       title: _questionController.text,
+
       option1: _option1Controller.text,
       option2: _option2Controller.text,
       option3: _option3Controller.text,
       option4: _option4Controller.text,
       marks: int.parse(_questionMarksController.text),
+      //quizId: ,
+      // type:answertype ,
+      //answer: answertype,
+      // AttemptsCount: int.parse(_attemptsCountController.text),
+      // NOQ: int.parse(_numberofQuestionController.text),
+      // TimeLimit: int.parse(_timeLimitController.text),
     );
+
+    // Navigator.push(
+    //     context,
+    //     MaterialPageRoute(
+    //         builder: (context) => CreateQuestion(
+    //           Question(),
+    //         )));
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // if (_formKey.currentState.validate()) {
+    //   quizId = randomAlphaNumeric(16);
+    //
+    //   FirebaseFirestore.instance.collection('Quiz').doc(quizId).set({
+    //     "quizId": quizId,
+    //     "teacherid": prefs.getString("teacherid"),
+    //     "tilte": _subjectController.text
+    //   }).then((value) {
+    //     setState(() {
+    //       _isLoding = false;
+    //       Navigator.pushReplacement(context,
+    //           MaterialPageRoute(builder: (context) => quizcreator(quizId)));
+    //     });
+    //   });
+    // }
   }
 
   Future<bool> _onWillPop() async {
-    // questions.removeLast();
     var count = context.read<AttemptProvider>().Counter;
     if (count == 1) {
       await _showMyDialog();
       return false;
     } else {
-      var counter = context.watch<AttemptProvider>().Counter;
-      var answers = context.watch<AttemptProvider>().Answers;
-      var attempt = context.watch<AttemptProvider>().attempt;
-      var ans = answers[counter - 1];
+      var counter = context.read<AttemptProvider>().Counter;
+      var answers = context.read<AttemptProvider>().Answers;
+      var attempt = context.read<AttemptProvider>().attempt;
+      var ans = answers[counter - 2];
       attempt.marks -= ans.marks;
-      answers.removeAt(counter - 1);
+      attempt.timeStamp = DateTime.now().toString();
+
+      var attJson = attempt.toJson();
+      await FirebaseFirestore.instance.collection("Attempts")
+      .doc(attempt.id).set(attJson).then((value) async {
+        await FirebaseFirestore.instance.collection("Answers")
+            .doc(ans.id).delete();
+      });
+
+      answers.removeAt(counter - 2);
       counter--;
-      context.watch<AttemptProvider>().Answers = answers;
-      context.watch<AttemptProvider>().attempt = attempt;
-      context.watch<AttemptProvider>().Counter = counter;
+      context.read<AttemptProvider>().Answers = answers;
+      context.read<AttemptProvider>().attempt = attempt;
+      context.read<AttemptProvider>().Counter = counter;
       return true;
     }
   }
@@ -105,8 +145,9 @@ class _AttemptQuizState extends State<AttemptQuiz> {
     final newQuiz = context.watch<AttemptProvider>().quiz;
     final counter = context.watch<AttemptProvider>().Counter;
     final questions = context.watch<AttemptProvider>().Questions;
-    final answers = context.watch<AttemptProvider>().Answers;
-    final attempt = context.watch<AttemptProvider>().attempt;
+    final remainingTime = context.watch<AttemptProvider>().RemainingTime;
+    context.watch<AttemptProvider>().context = context;
+    DateTime time = new DateTime(2021, 0, 0, 0, 0, remainingTime, 0);
 
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -115,7 +156,9 @@ class _AttemptQuizState extends State<AttemptQuiz> {
         appBar: AppBar(
           backwardsCompatibility: false,
           backgroundColor: Colors.amber,
-          title: Row(children: [
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
             Flexible(
               child: Text(
                 newQuiz.Title,
@@ -123,150 +166,140 @@ class _AttemptQuizState extends State<AttemptQuiz> {
               ),
               flex: 3,
             ),
-            Spacer(),
-            Text(counter.toString()),
-            Text('/'),
-            Text(newQuiz.NOQ.toString()),
+            Text(counter.toString() + '/' + newQuiz.NOQ.toString()),
           ]),
         ),
-        body: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          color: Colors.white54,
-          child: !loading
-              ? SingleChildScrollView(
-                  physics: AlwaysScrollableScrollPhysics(),
-                  padding: EdgeInsets.symmetric(horizontal: 0, vertical: 45),
-                  child: Container(
-                    child: Column(children: [
-                      question(questions[counter - 1]),
-                      setAnswers(questions[counter - 1]),
-                      counter != newQuiz.NOQ
-                          ? GestureDetector(
-                              child: Container(
-                                height: 110,
-                                width: 110,
-                                decoration: BoxDecoration(
-                                  color: Colors.amber,
-                                  border: Border.all(
-                                      width: 1, color: Colors.blueAccent),
-                                  borderRadius: BorderRadius.circular(60),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "Next",
-                                    style: TextStyle(
-                                      fontSize: 20.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.brown,
-                                    ),
+        body: !loading
+            ? SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 0, vertical: 45),
+                child: Container(
+                  child: Column(children: [
+                    Text("Time Left: " + DateFormat("H:m:s").format(time)),
+                    question(questions[counter - 1]),
+                    setAnswers(questions[counter - 1]),
+                    counter != newQuiz.NOQ
+                        ? GestureDetector(
+                            child: Container(
+                              height: 110,
+                              width: 110,
+                              decoration: BoxDecoration(
+                                color: Colors.amber,
+                                border: Border.all(
+                                    width: 1, color: Colors.blueAccent),
+                                borderRadius: BorderRadius.circular(60),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Next",
+                                  style: TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.brown,
                                   ),
                                 ),
                               ),
-                              onTap: () {
-                                nextQuestion(questions[counter - 1]);
-                                // setState(() {
-                                //   // totalmarks = int.parse(_questionMarksController.text) + totalmarks;
-                                //   if(answertype==1){
-                                //     if(_questionController.text.isEmpty){
-                                //       return Fluttertoast.showToast(msg: 'Question is missing');
-                                //     }
-                                //     else  if(_option1Controller.text.isEmpty ){
-                                //       return  Fluttertoast.showToast(msg: 'option 1 is missing');
-                                //     }
-                                //     else  if(_option2Controller.text.isEmpty){
-                                //       return Fluttertoast.showToast(msg: 'option 2 is missing');
-                                //     }
-                                //     else  if(_option3Controller.text.isEmpty ){
-                                //       return  Fluttertoast.showToast(msg: 'option 3 is missing');
-                                //     }
-                                //     else  if(_option4Controller.text.isEmpty ){
-                                //       return Fluttertoast.showToast(msg: 'option 4 is missing');
-                                //     }
-                                //     else if(correct_answer==0){
-                                //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
-                                //     }
-                                //     else{
-                                //       quiz_maker_fairbase();
-                                //     }
-                                //   }
-                                //   if(answertype==2){
-                                //     stringAnswer=_shortquestionController.text;
-                                //     if(_questionController.text.isEmpty){
-                                //       return Fluttertoast.showToast(msg: 'Question is missing');
-                                //     }
-                                //     else  if(_option1Controller.text.isEmpty ){
-                                //       return   Fluttertoast.showToast(msg: 'option 1 is missing');
-                                //     }
-                                //     else  if(_option2Controller.text.isEmpty){
-                                //       return Fluttertoast.showToast(msg: 'option 2 is missing');
-                                //     }
-                                //     else if(stringAnswer=='Null'){
-                                //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
-                                //       quesion_number = quesion_number + 1;
-                                //     }
-                                //   else{
-                                //       quiz_maker_fairbase();
-                                //       quesion_number = quesion_number + 1;
-                                //     }
-                                //   }
-                                //   if(answertype==3){
-                                //     if(_questionController.text.isEmpty){
-                                //             return Fluttertoast.showToast(msg: 'Question is missing');}
-                                //     else if(_shortquestionController.text.isEmpty){
-                                //      return Fluttertoast.showToast(msg: 'Answer is missing');
-                                //     }
-                                //     else if(stringAnswer=='Null'){
-                                //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
-                                //       quesion_number = quesion_number + 1;
-                                //     }
-                                //     else{
-                                //       //stringAnswer=_shortquestionController.text;
-                                //       quiz_maker_fairbase();
-                                //     }
-                                //   }
-                                // });
-                              },
-                            ) //for Add question
-                          : GestureDetector(
-                              child: Container(
-                                height: 80,
-                                width: 80,
-                                margin: EdgeInsets.only(top: 20),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      width: 1, color: Colors.blueAccent),
-                                  borderRadius: BorderRadius.circular(60),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "Finish",
-                                    style: TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.brown,
-                                    ),
+                            ),
+                            onTap: () {
+                              nextQuestion(questions[counter - 1]);
+                              // setState(() {
+                              //   // totalmarks = int.parse(_questionMarksController.text) + totalmarks;
+                              //   if(answertype==1){
+                              //     if(_questionController.text.isEmpty){
+                              //       return Fluttertoast.showToast(msg: 'Question is missing');
+                              //     }
+                              //     else  if(_option1Controller.text.isEmpty ){
+                              //       return  Fluttertoast.showToast(msg: 'option 1 is missing');
+                              //     }
+                              //     else  if(_option2Controller.text.isEmpty){
+                              //       return Fluttertoast.showToast(msg: 'option 2 is missing');
+                              //     }
+                              //     else  if(_option3Controller.text.isEmpty ){
+                              //       return  Fluttertoast.showToast(msg: 'option 3 is missing');
+                              //     }
+                              //     else  if(_option4Controller.text.isEmpty ){
+                              //       return Fluttertoast.showToast(msg: 'option 4 is missing');
+                              //     }
+                              //     else if(correct_answer==0){
+                              //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
+                              //     }
+                              //     else{
+                              //       quiz_maker_fairbase();
+                              //     }
+                              //   }
+                              //   if(answertype==2){
+                              //     stringAnswer=_shortquestionController.text;
+                              //     if(_questionController.text.isEmpty){
+                              //       return Fluttertoast.showToast(msg: 'Question is missing');
+                              //     }
+                              //     else  if(_option1Controller.text.isEmpty ){
+                              //       return   Fluttertoast.showToast(msg: 'option 1 is missing');
+                              //     }
+                              //     else  if(_option2Controller.text.isEmpty){
+                              //       return Fluttertoast.showToast(msg: 'option 2 is missing');
+                              //     }
+                              //     else if(stringAnswer=='Null'){
+                              //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
+                              //       quesion_number = quesion_number + 1;
+                              //     }
+                              //   else{
+                              //       quiz_maker_fairbase();
+                              //       quesion_number = quesion_number + 1;
+                              //     }
+                              //   }
+                              //   if(answertype==3){
+                              //     if(_questionController.text.isEmpty){
+                              //             return Fluttertoast.showToast(msg: 'Question is missing');}
+                              //     else if(_shortquestionController.text.isEmpty){
+                              //      return Fluttertoast.showToast(msg: 'Answer is missing');
+                              //     }
+                              //     else if(stringAnswer=='Null'){
+                              //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
+                              //       quesion_number = quesion_number + 1;
+                              //     }
+                              //     else{
+                              //       //stringAnswer=_shortquestionController.text;
+                              //       quiz_maker_fairbase();
+                              //     }
+                              //   }
+                              // });
+                            },
+                          ) //for Add question
+                        : GestureDetector(
+                            child: Container(
+                              height: 80,
+                              width: 80,
+                              margin: EdgeInsets.only(top: 20),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                    width: 1, color: Colors.blueAccent),
+                                borderRadius: BorderRadius.circular(60),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Finish",
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.brown,
                                   ),
                                 ),
                               ),
-                              onTap: () {
-                                finishQuiz(questions[counter - 1]);
-                              },
-                            ), //for finish question
-                    ]),
-                  ),
-                )
-              : Expanded(
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      backgroundColor: Colors.amber,
-                      valueColor:
-                          new AlwaysStoppedAnimation<Color>(Colors.white54),
-                    ),
-                  ),
+                            ),
+                            onTap: () {
+                              finishQuiz(questions[counter - 1]);
+                            },
+                          ), //for finish question
+                  ]),
                 ),
-        ),
+              )
+            : Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.amber,
+                valueColor:
+                    new AlwaysStoppedAnimation<Color>(Colors.white54),
+              ),
+            ),
       ),
     );
   }
@@ -275,6 +308,7 @@ class _AttemptQuizState extends State<AttemptQuiz> {
     if (que.type == QuestionType.MCQ.toString().split('.').last) {
       return radio_Buttonoption(que);
     } else if (que.type == QuestionType.TrueFalse.toString().split('.').last) {
+      setAnswerForTrueFalse(_isTrue);
       return chackBox();
     } else if (que.type ==
         QuestionType.ShortQuestion.toString().split('.').last) {
@@ -303,13 +337,7 @@ class _AttemptQuizState extends State<AttemptQuiz> {
           Expanded(
             child: Text(que.title),
           ),
-          // Text(
-          // 'Total_Marks  ' + totalmarks.toString(),
-          // style: TextStyle(
-          //   color: Colors.grey,
-          //   fontSize: 18,
-          //   fontWeight: FontWeight.w500),
-          // ),
+
         ],
       ),
     );
@@ -565,6 +593,8 @@ class _AttemptQuizState extends State<AttemptQuiz> {
   void finishQuiz(Question que) {
     context.read<AttemptProvider>().AttemptQuizLoading = true;
     var attempt = context.read<AttemptProvider>().attempt;
+    var remTime = context.read<AttemptProvider>().RemainingTime;
+    var quiz = context.read<AttemptProvider>().quiz;
     var uuid = Uuid();
     Answer ans = new Answer(
         id: uuid.v4(),
@@ -574,6 +604,7 @@ class _AttemptQuizState extends State<AttemptQuiz> {
         attemptId: attempt.id);
     attempt.marks += ans.marks;
     attempt.timeStamp = DateTime.now().toString();
+    attempt.timeTaken = quiz.TimeLimit - remTime;
     var ansJson = ans.toJson();
     var attemptJson = attempt.toJson();
     FirebaseFirestore.instance
@@ -589,20 +620,11 @@ class _AttemptQuizState extends State<AttemptQuiz> {
         context.read<AttemptProvider>().attempt = attempt;
 
         context.read<AttemptProvider>().Answers.add(ans);
-        // var answers = context.read<AttemptProvider>().Answers;
-        // if(answers.any((element) => element.id == ans.id)){
-        //    var item = answers.where((element) => element.id == ans.id).first;
-        //    var index = answers.indexOf(item);
-        //    context.read<AttemptProvider>().Answers[index] = ans;
-        // }
-        // else{
-        //   context.read<AttemptProvider>().Answers.add(ans);
-        // }
 
-        context.read<AttemptProvider>().Counter++;
-        context.read<AttemptProvider>().AttemptQuizLoading = false;
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => AttemptQuiz()));
+        // context.read<AttemptProvider>().Counter++;
+        // context.read<AttemptProvider>().AttemptQuizLoading = false;
+        context.read<AttemptProvider>().timer.cancel();
+
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (context) => StudentHome(),
@@ -640,6 +662,8 @@ class _AttemptQuizState extends State<AttemptQuiz> {
               child: Text('Yes',
                   style: TextStyle(color: Colors.red, fontSize: 16)),
               onPressed: () {
+                context.read<AttemptProvider>().timer.cancel();
+                context.read<AttemptProvider>().finishQuiz();
                 SystemNavigator.pop();
               },
             )
