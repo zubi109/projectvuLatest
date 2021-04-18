@@ -27,7 +27,21 @@ class _AttemptQuizState extends State<AttemptQuiz> {
   String quiznumber = "Quiz";
   String givenAnswer = '';
   bool _isTrue = false;
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController _questionController = TextEditingController();
+  TextEditingController _option1Controller =
+  TextEditingController(text: "option1");
+  TextEditingController _option2Controller =
+  TextEditingController(text: "option2");
+  TextEditingController _option3Controller =
+  TextEditingController(text: "option3");
+  TextEditingController _option4Controller =
+  TextEditingController(text: "option4");
+  TextEditingController _questionMarksController = TextEditingController();
+  TextEditingController _shortquestionController = TextEditingController();
 
+  int answertype = 0, opstionNumber = 1;
+  
   void setAnswerForTrueFalse(bool value) {
     setState(() {
       if (value)
@@ -35,36 +49,6 @@ class _AttemptQuizState extends State<AttemptQuiz> {
       else
         givenAnswer = "False";
     });
-  }
-
-  TextEditingController _questionController = TextEditingController();
-  TextEditingController _option1Controller =
-      TextEditingController(text: "option1");
-  TextEditingController _option2Controller =
-      TextEditingController(text: "option2");
-  TextEditingController _option3Controller =
-      TextEditingController(text: "option3");
-  TextEditingController _option4Controller =
-      TextEditingController(text: "option4");
-  TextEditingController _questionMarksController = TextEditingController();
-  TextEditingController _shortquestionController = TextEditingController();
-
-  int answertype = 0, opstionNumber = 1;
-//  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    // counter++;
-    // if(que.id != null){
-    //   if(questions.any((element) => element.id == que.id)){
-    //     var item = questions.where((element) => element.id == que.id).first;
-    //     var index = questions.indexOf(item);
-    //     questions[index] = que;
-    //   }
-    //   else{
-    //     questions.add(que);
-    //   }
-    // }
   }
 
   createQuizeline() {
@@ -172,126 +156,61 @@ class _AttemptQuizState extends State<AttemptQuiz> {
           ),
           body: !loading
               ? SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 0, vertical: 45),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                   child: Container(
-                    child: Column(children: [
-                      Text("Time Left: " + DateFormat("HH:mm:ss").format(time)),
-                      question(questions[counter - 1]),
-                      setAnswers(questions[counter - 1]),
-                      counter != newQuiz.NOQ
-                          ? GestureDetector(
+                    child: Form(
+                      child: Column(children: [
+                        Text("Time Left: " + DateFormat("HH:mm:ss").format(time)),
+                        SizedBox(height:20),
+                        Card(
+                          child: Column(children: [
+                            SizedBox(height: 20),
+                                question(questions[counter - 1]),
+                          setAnswers(questions[counter - 1]),
+                          ]),
+                        ),
+                        SizedBox(height:20),
+                        counter != newQuiz.NOQ
+                            ?Row(children: [
+                          Expanded(
                               child: Container(
-                                height: 110,
-                                width: 110,
-                                decoration: BoxDecoration(
-                                  color: Colors.amber,
-                                  border: Border.all(
-                                      width: 1, color: Colors.blueAccent),
-                                  borderRadius: BorderRadius.circular(60),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "Next",
-                                    style: TextStyle(
-                                      fontSize: 20.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.brown,
+                                color: Colors.amber,
+                                height: 50,
+                                child: ElevatedButton(
+                                  // primary: Colors.amber, // background
+                                    onPressed: () {
+                                      nextQuestion(questions[counter - 1]);
+                                    },
+                                    child: Text(
+                                      "Next",
+                                      style: TextStyle(fontSize: 22),
                                     ),
-                                  ),
+                                    style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.amber)
+                                    )
                                 ),
-                              ),
-                              onTap: () {
-                                nextQuestion(questions[counter - 1]);
-                                // setState(() {
-                                //   // totalmarks = int.parse(_questionMarksController.text) + totalmarks;
-                                //   if(answertype==1){
-                                //     if(_questionController.text.isEmpty){
-                                //       return Fluttertoast.showToast(msg: 'Question is missing');
-                                //     }
-                                //     else  if(_option1Controller.text.isEmpty ){
-                                //       return  Fluttertoast.showToast(msg: 'option 1 is missing');
-                                //     }
-                                //     else  if(_option2Controller.text.isEmpty){
-                                //       return Fluttertoast.showToast(msg: 'option 2 is missing');
-                                //     }
-                                //     else  if(_option3Controller.text.isEmpty ){
-                                //       return  Fluttertoast.showToast(msg: 'option 3 is missing');
-                                //     }
-                                //     else  if(_option4Controller.text.isEmpty ){
-                                //       return Fluttertoast.showToast(msg: 'option 4 is missing');
-                                //     }
-                                //     else if(correct_answer==0){
-                                //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
-                                //     }
-                                //     else{
-                                //       quiz_maker_fairbase();
-                                //     }
-                                //   }
-                                //   if(answertype==2){
-                                //     stringAnswer=_shortquestionController.text;
-                                //     if(_questionController.text.isEmpty){
-                                //       return Fluttertoast.showToast(msg: 'Question is missing');
-                                //     }
-                                //     else  if(_option1Controller.text.isEmpty ){
-                                //       return   Fluttertoast.showToast(msg: 'option 1 is missing');
-                                //     }
-                                //     else  if(_option2Controller.text.isEmpty){
-                                //       return Fluttertoast.showToast(msg: 'option 2 is missing');
-                                //     }
-                                //     else if(stringAnswer=='Null'){
-                                //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
-                                //       quesion_number = quesion_number + 1;
-                                //     }
-                                //   else{
-                                //       quiz_maker_fairbase();
-                                //       quesion_number = quesion_number + 1;
-                                //     }
-                                //   }
-                                //   if(answertype==3){
-                                //     if(_questionController.text.isEmpty){
-                                //             return Fluttertoast.showToast(msg: 'Question is missing');}
-                                //     else if(_shortquestionController.text.isEmpty){
-                                //      return Fluttertoast.showToast(msg: 'Answer is missing');
-                                //     }
-                                //     else if(stringAnswer=='Null'){
-                                //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
-                                //       quesion_number = quesion_number + 1;
-                                //     }
-                                //     else{
-                                //       //stringAnswer=_shortquestionController.text;
-                                //       quiz_maker_fairbase();
-                                //     }
-                                //   }
-                                // });
-                              },
-                            ) //for Add question
-                          : GestureDetector(
+                              ))
+                        ])
+                            :Row(children: [
+                          Expanded(
                               child: Container(
-                                height: 80,
-                                width: 80,
-                                margin: EdgeInsets.only(top: 20),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      width: 1, color: Colors.blueAccent),
-                                  borderRadius: BorderRadius.circular(60),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "Finish",
-                                    style: TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.brown,
+                                color: Colors.amber,
+                                height: 50,
+                                child: ElevatedButton(
+                                  // primary: Colors.amber, // background
+                                    onPressed: () {
+                                      finishQuiz(questions[counter - 1]);
+                                    },
+                                    child: Text(
+                                      "Finish",
+                                      style: TextStyle(fontSize: 22),
                                     ),
-                                  ),
+                                    style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.amber)
+                                    )
                                 ),
-                              ),
-                              onTap: () {
-                                finishQuiz(questions[counter - 1]);
-                              },
-                            ), //for finish question
-                    ]),
+                              ))
+                        ]),//for finish question
+                      ]),
+                    ),
                   ),
                 )
               : Center(
@@ -309,20 +228,21 @@ class _AttemptQuizState extends State<AttemptQuiz> {
   Widget setAnswers(Question que) {
     if (que.type == QuestionType.MCQ.toString().split('.').last) {
       return radio_Buttonoption(que);
-    } else if (que.type == QuestionType.TrueFalse.toString().split('.').last) {
+    }
+    else if (que.type == QuestionType.TrueFalse.toString().split('.').last) {
       setAnswerForTrueFalse(_isTrue);
       return chackBox();
-    } else if (que.type ==
-        QuestionType.ShortQuestion.toString().split('.').last) {
+    }
+    else if (que.type == QuestionType.ShortQuestion.toString().split('.').last) {
       return Short_Question_Buttonoption();
-    } else {
+    }
+    else {
       return SizedBox();
     }
   }
 
   Widget question(Question que) {
     return Container(
-      height: 90,
       margin: EdgeInsets.only(left: 10, right: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(100),
@@ -448,14 +368,17 @@ class _AttemptQuizState extends State<AttemptQuiz> {
       child: Column(
         children: <Widget>[
           ListTile(
-            title: TextField(
+            title: TextFormField(
+              cursorColor: Colors.amber,
               decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: 'Enter Your Answer',
-                hintStyle: TextStyle(fontSize: 14.0, color: Colors.amber),
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey)),
+                focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber)),
+                hintText: 'Enter the Answer',
               ),
               controller: _shortquestionController,
-            ),
+            )
           ),
         ],
       ),
