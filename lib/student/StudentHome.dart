@@ -15,6 +15,7 @@ import 'package:projectvu/teacher/ViewQuiz.dart';
 import 'package:projectvu/utilities/UserData.dart';
 import 'package:projectvu/utilities/quize_Data_Base.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -39,6 +40,26 @@ class _StudentHomeState extends State<StudentHome> {
 
   int counter_for_Quiz_number = 1;
   bool color_selection_quiz_tile = true;
+
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
+  void _onRefresh() async {
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use refreshFailed()
+    await initData();
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use loadFailed(),if no data return,use LoadNodata()
+
+    if (mounted) setState(() {});
+    _refreshController.loadComplete();
+  }
 
   @override
   void initState() {
@@ -143,107 +164,140 @@ class _StudentHomeState extends State<StudentHome> {
       child: Scaffold(
         appBar: AppBar(
             backgroundColor: Colors.amber,
-            title:
-                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              const Text('Quizzes List'),
-              SizedBox(),
-              InkWell(
-                child: Center(
-                  child: Text(
-                    "Logout",
-                    style: TextStyle(fontSize: 16.0, color: Colors.white),
-                  ),
-                ),
-                onTap: () async {
-                  setState(() {
-                    // FirebaseAuth.instance.signOut();
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => (Login())));
-                  });
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                  prefs.setString(
-                      UserData.role.toString().split('.').last, "LoggedOut");
-                },
-              ),
-            ])),
-        body: _isLoding == false
-            ? ListView.builder(
-            shrinkWrap: true,
-            itemCount: quizzes == null ? 0 : quizzes.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Card(
-                child: Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Text(
-                        quizzes[index].Title,
-                        style: TextStyle(
-                            fontSize: 20.0, color: Colors.black54),
+            title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Quizzes List'),
+                  SizedBox(),
+                  InkWell(
+                    child: Center(
+                      child: Text(
+                        "Logout",
+                        style: TextStyle(fontSize: 16.0, color: Colors.white),
                       ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          InkWell(
-                            child: Center(
-                              child: Text(
-                                "View Quiz",
-                                style: TextStyle(
-                                    fontSize: 16.0, color: Colors.amber),
-                              ),
-                            ),
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                      (ViewQuiz(quizzes[index]))));
-                            },
-                          ),
-                          InkWell(
-                            child: Center(
-                              child: Text(
-                                "Attempt",
-                                style: TextStyle(
-                                    fontSize: 16.0, color: Colors.amber),
-                              ),
-                            ),
-                            onTap: () async {
-                              await attemptQuiz(quizzes[index]);
-                            },
-                          ),
-                          InkWell(
-                            child: Center(
-                              child: Text(
-                                "View Result",
-                                style: TextStyle(
-                                    fontSize: 16.0, color: Colors.amber),
-                              ),
-                            ),
-                            onTap: () {
-                              initViewResult(quizzes[index]);
-                            },
-                          ),
-                        ],
-                      )
-                    ],
+                    ),
+                    onTap: () async {
+                      setState(() {
+                        // FirebaseAuth.instance.signOut();
+                        Navigator.pushReplacement(context,
+                            MaterialPageRoute(builder: (context) => (Login())));
+                      });
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      prefs.setString(UserData.role.toString().split('.').last,
+                          "LoggedOut");
+                    },
                   ),
+                ])),
+        body: _isLoding == false
+            ? SmartRefresher(
+                enablePullDown: true,
+                enablePullUp: false,
+                header: WaterDropHeader(),
+                footer: CustomFooter(
+                  builder: (BuildContext context, LoadStatus mode) {
+                    Widget body;
+                    if (mode == LoadStatus.idle) {
+                      body = Text("pull up load");
+                    } else if (mode == LoadStatus.loading) {
+                      body = CupertinoActivityIndicator();
+                    } else if (mode == LoadStatus.failed) {
+                      body = Text("Load Failed!Click retry!");
+                    } else if (mode == LoadStatus.canLoading) {
+                      body = Text("release to load more");
+                    } else {
+                      body = Text("No more Data");
+                    }
+                    return Container(
+                      height: 55.0,
+                      child: Center(child: body),
+                    );
+                  },
                 ),
-              );
-            })
+                controller: _refreshController,
+                onRefresh: _onRefresh,
+                onLoading: _onLoading,
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: quizzes == null ? 0 : quizzes.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Card(
+                        child: Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Column(
+                            children: [
+                              Text(
+                                quizzes[index].Title,
+                                style: TextStyle(
+                                    fontSize: 20.0, color: Colors.black54),
+                              ),
+                              SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  InkWell(
+                                    child: Center(
+                                      child: Text(
+                                        "View Quiz",
+                                        style: TextStyle(
+                                            fontSize: 16.0,
+                                            color: Colors.amber),
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  (ViewQuiz(quizzes[index]))));
+                                    },
+                                  ),
+                                  InkWell(
+                                    child: Center(
+                                      child: Text(
+                                        "Attempt",
+                                        style: TextStyle(
+                                            fontSize: 16.0,
+                                            color: Colors.amber),
+                                      ),
+                                    ),
+                                    onTap: () async {
+                                      await attemptQuiz(quizzes[index]);
+                                    },
+                                  ),
+                                  InkWell(
+                                    child: Center(
+                                      child: Text(
+                                        "View Result",
+                                        style: TextStyle(
+                                            fontSize: 16.0,
+                                            color: Colors.amber),
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      initViewResult(quizzes[index]);
+                                    },
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+              )
             : Center(
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.amber,
-                valueColor:
-                new AlwaysStoppedAnimation<Color>(Colors.white54),
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.amber,
+                  valueColor: new AlwaysStoppedAnimation<Color>(Colors.white54),
+                ),
               ),
-            ),
       ),
     );
   }
 
-  initViewResult(Quiz quiz) async{
+  initViewResult(Quiz quiz) async {
     setState(() {
       _isLoding = true;
     });
@@ -261,15 +315,11 @@ class _StudentHomeState extends State<StudentHome> {
       attList.add(Attempt.fromJson(item.data()));
     }
 
-    if(attList.length == 0){
+    if (attList.length == 0) {
       Fluttertoast.showToast(msg: "You have not attempted this quiz yet!");
-    }
-    else{
+    } else {
       Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-              (ViewResult(quiz))));
+          context, MaterialPageRoute(builder: (context) => (ViewResult(quiz))));
     }
     setState(() {
       _isLoding = false;
