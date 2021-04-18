@@ -6,6 +6,8 @@ import 'package:projectvu/utilities/QuestionType.dart';
 import 'package:projectvu/utilities/UserData.dart';
 import 'package:projectvu/utilities/UserRole.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
+
 
 class ViewQuiz extends StatefulWidget {
   Quiz quiz;
@@ -48,14 +50,16 @@ class _ViewQuizState extends State<ViewQuiz> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.amber,
-        title: const Text('Quiz View'),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.amber,
+          title: const Text('Quiz View'),
+        ),
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.white,
+        body: boddy(),
       ),
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
-      body: boddy(),
     );
   }
 
@@ -98,7 +102,7 @@ class _ViewQuizState extends State<ViewQuiz> {
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.amber)), //time
-                          Text("${widget.quiz.TimeLimit}"),
+                          Text("${DateFormat("HH:mm:ss").format(DateTime(2021, 0, 0, 0, 0, widget.quiz.TimeLimit, 0))}"),
                         ]),
                         Row(children: [
                           Text("Total Marks: ",
@@ -154,7 +158,11 @@ class _ViewQuizState extends State<ViewQuiz> {
             return listTile(questions[index]);
           });
     } else {
-      return CircularProgressIndicator();
+      return CircularProgressIndicator(
+        backgroundColor: Colors.amber,
+        valueColor:
+        new AlwaysStoppedAnimation<Color>(Colors.white54),
+      );
     }
   }
 
@@ -172,12 +180,11 @@ class _ViewQuizState extends State<ViewQuiz> {
           // SharedPreferences prefs = await SharedPreferences.getInstance();
           // prefs.getString(UserData.role.toString().split('.').last);
           // //role = UserRole.Student.toString().split('.').last;
-
-          ListTile(
-            title: role == UserRole.Student.toString().split(".").last
-                ? SizedBox()
-                : Text('Answer: ' + question.answer),
-          ), //Answer
+          role != UserRole.Student.toString().split(".").last
+          ?ListTile(
+            title: Text('Answer: ' + question.answer),
+          )
+          :SizedBox(), //Answer
           ListTile(
             title: Text('Question Type: ' + question.type),
           ), //question type

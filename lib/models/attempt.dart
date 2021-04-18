@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:projectvu/models/User.dart';
 
 @JsonSerializable()
 class Attempt {
@@ -8,6 +9,7 @@ class Attempt {
   int timeTaken;
   String timeStamp;
   String quizId;
+  QCUser Student;
 
   Attempt(
       {this.marks,

@@ -17,6 +17,7 @@ class signup extends StatefulWidget {
 class _signupState extends State<signup> {
   bool visiblesignup = true, visiblesignup2 = true, selectroll = true;
   var roll = 0, uid;
+  bool isLoading = false;
 
   TextEditingController _fullnameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
@@ -25,35 +26,32 @@ class _signupState extends State<signup> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.amber,
-        centerTitle: true,
-        title: Text(
-          'Registration Form',
+    return SafeArea(
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.amber,
+          centerTitle: true,
+          title: Text(
+            'Registration Form',
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: Card(child: signUpFields()),
-        ),
+        body: Card(margin: EdgeInsets.all(20), child: signUpFields()),
       ),
     );
   }
 //***********************************************************authentication_Sign_up********************************************************
 
   Future<void> authenticationsignup() async {
+    setState(() {
+      isLoading = true;
+    });
     FirebaseAuth auth = FirebaseAuth.instance;
-
     try {
       if (_passwordController.text == _confPassController.text) {
-        await auth.createUserWithEmailAndPassword(
+        await auth
+            .createUserWithEmailAndPassword(
           email: _emailController.text,
           password: _passwordController.text,
         )
@@ -63,18 +61,37 @@ class _signupState extends State<signup> {
           }
         });
       }
-    } catch(signUpError) {
-      if(signUpError is PlatformException) {
-        if(signUpError.code == 'ERROR_EMAIL_ALREADY_IN_USE') {
-          /// `foo@bar.com` has alread been registered.
+      setState(() {
+        isLoading = false;
+      });
+    } on PlatformException catch (e) {
+      if (e.code == 'firebase_auth') {
+        if(e.details['code'] == '"code" -> "weak-password"'){
+          Fluttertoast.showToast(msg:'The password provided is too weak.');
+          setState(() {
+            isLoading = false;
+          });
+        }
+        else if (e.details['code'] == 'email-already-in-use') {
+          Fluttertoast.showToast(msg:'The account already exists for that email.');
+          setState(() {
+            isLoading = false;
+          });
         }
       }
+    }on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        Fluttertoast.showToast(msg:'The password provided is too weak.');
+        setState(() {
+          isLoading = false;
+        });
+      } else if (e.code == 'email-already-in-use') {
+        Fluttertoast.showToast(msg:'The account already exists for that email.');
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
-
-
-
-
-
   }
 
   void studentDataEnter(v) {
@@ -102,19 +119,35 @@ class _signupState extends State<signup> {
 
 //***********************************************************signUp********************************************************
   Widget signUpFields() {
-    return Container(
-        margin: EdgeInsets.only(left: 10, right: 20),      // margin: EdgeInsets.only(top:50 ,left: 20 ,right: 20,bottom: 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          // mainAxisSize: MainAxisSize.min,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      // mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          margin: EdgeInsets.all(5),
+          height: 110,
+          width: 110,
           decoration: BoxDecoration(
-            // //border: Border.all(width: 1, color: Colors.black),
-            // borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
+            color: Colors.amber
+            ,
+            //border: Border.all(width: 1, color: Colors.black),
+            borderRadius: BorderRadius.circular(120),
           ),
+          child: Center(
+
+            child: Text(
+              'Signup',
+              style: TextStyle(
+                fontSize:32.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white.withOpacity(1.0),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 20),// logo title
+        Theme(
+          data: Theme.of(context)
+              .copyWith(primaryColor: Colors.amber),
           child: TextField(
             decoration: InputDecoration(
               enabledBorder: UnderlineInputBorder(
@@ -131,14 +164,10 @@ class _signupState extends State<signup> {
             controller: _fullnameController,
           ),
         ), //name
-
-        Container(
-          margin: EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            // //border: Border.all(width: 1, color: Colors.black),
-            // borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
-          ),
+        SizedBox(height: 20),// logo title
+        Theme(
+          data: Theme.of(context)
+              .copyWith(primaryColor: Colors.amber),
           child: TextField(
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
@@ -155,14 +184,10 @@ class _signupState extends State<signup> {
             controller: _emailController,
           ),
         ), //email
-
-        Container(
-          margin: EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            // //border: Border.all(width: 1, color: Colors.black),
-            // borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
-          ),
+        SizedBox(height: 20),// logo title
+        Theme(
+          data: Theme.of(context)
+              .copyWith(primaryColor: Colors.amber),
           child: TextField(
             cursorColor: Colors.blueAccent,
             decoration: InputDecoration(
@@ -197,14 +222,10 @@ class _signupState extends State<signup> {
             controller: _passwordController,
           ),
         ), //password
-
-        Container(
-          margin: EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            // //border: Border.all(width: 1, color: Colors.black),
-            // borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
-          ),
+        SizedBox(height: 20),// logo title
+        Theme(
+          data: Theme.of(context)
+              .copyWith(primaryColor: Colors.amber),
           child: TextField(
             cursorColor: Colors.blueAccent,
             decoration: InputDecoration(
@@ -240,69 +261,84 @@ class _signupState extends State<signup> {
             controller: _confPassController,
           ),
         ), //confirmation password
-
-        GestureDetector(
-          child: Container(
-            height: 50,
-            width: 90,
-            margin: EdgeInsets.all(5),
-            decoration: BoxDecoration(
-              color: Colors.amber,
-              border: Border.all(width: 2, color: Colors.blueAccent),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Center(
-              child: Text(
-                "Sign_Up",
-                style: TextStyle(fontSize: 20.0),
-              ),
-            ),
-          ),
-          onTap: () {
-            if (_fullnameController.text.isEmpty&&_emailController.text.isEmpty&&_passwordController.text.isEmpty&&_confPassController.text.isEmpty)
-              return Fluttertoast.showToast(
-                  msg: "All fields Empty ");
-            else if (_fullnameController.text.isEmpty)
-              return Fluttertoast.showToast(
-                  msg: "Please Enter Your name");
-            else if( !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(_emailController.text))
-              return Fluttertoast.showToast(
-                  msg: ' NOT valid email Format');
-           else if (_emailController.text.isEmpty)
-              return Fluttertoast.showToast(
-                  msg: "Please Enter Email");
-            else if (_passwordController.text.isEmpty)
-              return Fluttertoast.showToast(
-                  msg: "Please Enter Password");
-            else if (_confPassController.text.isEmpty)
-              return Fluttertoast.showToast(
-                  msg: "Please Enter confirm Password");
-            else if (_passwordController.text != _confPassController.text)
-              return Fluttertoast.showToast(
-                  msg: "Confirm Password not match");
-            else{authenticationsignup();}
-          },
-        ),
-
+        SizedBox(height: 20),
+        Row(children: [
+          Expanded(
+              child: Container(
+                color: Colors.amber,
+                height: 50,
+                child: ElevatedButton(
+                  // primary: Colors.amber, // background
+                    onPressed: () {
+                      if (_fullnameController.text.isEmpty &&
+                          _emailController.text.isEmpty &&
+                          _passwordController.text.isEmpty &&
+                          _confPassController.text.isEmpty)
+                        return Fluttertoast.showToast(msg: "All fields Empty ");
+                      else if (_fullnameController.text.isEmpty)
+                        return Fluttertoast.showToast(msg: "Please Enter Your name");
+                      else if (!RegExp(
+                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                          .hasMatch(_emailController.text))
+                        return Fluttertoast.showToast(msg: ' NOT valid email Format');
+                      else if (_emailController.text.isEmpty)
+                        return Fluttertoast.showToast(msg: "Please Enter Email");
+                      else if (_passwordController.text.isEmpty)
+                        return Fluttertoast.showToast(msg: "Please Enter Password");
+                      else if (_confPassController.text.isEmpty)
+                        return Fluttertoast.showToast(
+                            msg: "Please Enter confirm Password");
+                      else if (_passwordController.text != _confPassController.text)
+                        return Fluttertoast.showToast(msg: "Confirm Password not match");
+                      else {
+                        authenticationsignup();
+                      }
+                    },
+                    child: !isLoading
+                        ?Text(
+                      "Signup",
+                      style: TextStyle(fontSize: 22),
+                    )
+                        :CircularProgressIndicator(
+                      backgroundColor: Colors.white,
+                      valueColor:
+                      new AlwaysStoppedAnimation<Color>(Colors.amber),
+                    ),
+                    style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.amber)
+                      // style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                      //       (Set<MaterialState> states) {
+                      //     if (states.contains(MaterialState.pressed))
+                      //       return Colors.amber;
+                      //     return null; // Use the component's default.
+                      //   },
+                      // )),
+                    )
+                ),
+              ))
+        ]),// logo title
+        SizedBox(height: 20),// logo title
         Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Already have an account? "),
+            Text("Already have an account?  "),
             InkWell(
               onTap: () {
                 setState(() {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Login()));
+                  Navigator.pop(context);
                 });
+                // loginScreen = false;
               },
               child: Text(
-                "Sign in",
-                style: TextStyle(fontSize: 18.0, color: Colors.amber),
+                "Login",
+                style: TextStyle(
+                  fontSize: 18.0,
+                  color: Colors.amber,
+                ),
               ),
-            ),
+            )
           ],
         ),
       ],
-    ));
+    );
   }
 }

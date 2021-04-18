@@ -8,6 +8,7 @@ import 'package:projectvu/models/attempt.dart';
 import 'package:projectvu/models/quiz.dart';
 import 'package:projectvu/providers/AttemptProvider.dart';
 import 'package:projectvu/student/AttemptQuiz.dart';
+import 'package:projectvu/student/ViewResult.dart';
 import 'package:projectvu/teacher/CreateQuestion.dart';
 import 'package:projectvu/teacher/CreateQuiz.dart';
 import 'package:projectvu/teacher/ViewQuiz.dart';
@@ -138,104 +139,141 @@ class _StudentHomeState extends State<StudentHome> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          backgroundColor: Colors.amber,
-          title:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            const Text('Quizzes List'),
-            SizedBox(),
-            InkWell(
-              child: Center(
-                child: Text(
-                  "Logout",
-                  style: TextStyle(fontSize: 16.0, color: Colors.white),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+            backgroundColor: Colors.amber,
+            title:
+                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              const Text('Quizzes List'),
+              SizedBox(),
+              InkWell(
+                child: Center(
+                  child: Text(
+                    "Logout",
+                    style: TextStyle(fontSize: 16.0, color: Colors.white),
+                  ),
                 ),
+                onTap: () async {
+                  setState(() {
+                    // FirebaseAuth.instance.signOut();
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => (Login())));
+                  });
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  prefs.setString(
+                      UserData.role.toString().split('.').last, "LoggedOut");
+                },
               ),
-              onTap: () async {
-                setState(() {
-                  // FirebaseAuth.instance.signOut();
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => (Login())));
-                });
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                prefs.setString(
-                    UserData.role.toString().split('.').last, "LoggedOut");
-              },
-            ),
-          ])),
-      body: _isLoding == false
-          ? ListView.builder(
-          shrinkWrap: true,
-          itemCount: quizzes == null ? 0 : quizzes.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Card(
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Text(
-                      quizzes[index].Title,
-                      style: TextStyle(
-                          fontSize: 20.0, color: Colors.black54),
-                    ),
-                    SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        InkWell(
-                          child: Center(
-                            child: Text(
-                              "View Quiz",
-                              style: TextStyle(
-                                  fontSize: 16.0, color: Colors.amber),
+            ])),
+        body: _isLoding == false
+            ? ListView.builder(
+            shrinkWrap: true,
+            itemCount: quizzes == null ? 0 : quizzes.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Card(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Text(
+                        quizzes[index].Title,
+                        style: TextStyle(
+                            fontSize: 20.0, color: Colors.black54),
+                      ),
+                      SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          InkWell(
+                            child: Center(
+                              child: Text(
+                                "View Quiz",
+                                style: TextStyle(
+                                    fontSize: 16.0, color: Colors.amber),
+                              ),
                             ),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                      (ViewQuiz(quizzes[index]))));
+                            },
                           ),
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                    (ViewQuiz(quizzes[index]))));
-                          },
-                        ),
-                        InkWell(
-                          child: Center(
-                            child: Text(
-                              "Attempt",
-                              style: TextStyle(
-                                  fontSize: 16.0, color: Colors.amber),
+                          InkWell(
+                            child: Center(
+                              child: Text(
+                                "Attempt",
+                                style: TextStyle(
+                                    fontSize: 16.0, color: Colors.amber),
+                              ),
                             ),
+                            onTap: () async {
+                              await attemptQuiz(quizzes[index]);
+                            },
                           ),
-                          onTap: () async {
-                            await attemptQuiz(quizzes[index]);
-                          },
-                        ),
-                        InkWell(
-                          child: Center(
-                            child: Text(
-                              "View Result",
-                              style: TextStyle(
-                                  fontSize: 16.0, color: Colors.amber),
+                          InkWell(
+                            child: Center(
+                              child: Text(
+                                "View Result",
+                                style: TextStyle(
+                                    fontSize: 16.0, color: Colors.amber),
+                              ),
                             ),
+                            onTap: () {
+                              initViewResult(quizzes[index]);
+                            },
                           ),
-                          onTap: () async {},
-                        ),
-                      ],
-                    )
-                  ],
+                        ],
+                      )
+                    ],
+                  ),
                 ),
+              );
+            })
+            : Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.amber,
+                valueColor:
+                new AlwaysStoppedAnimation<Color>(Colors.white54),
               ),
-            );
-          })
-          : Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.amber,
-              valueColor:
-              new AlwaysStoppedAnimation<Color>(Colors.white54),
             ),
-          ),
+      ),
     );
+  }
+
+  initViewResult(Quiz quiz) async{
+    setState(() {
+      _isLoding = true;
+    });
+
+    var pref = await SharedPreferences.getInstance();
+    var stuId = pref.getString(UserData.uid.toString().split(".").last);
+
+    var attSnap = await FirebaseFirestore.instance
+        .collection("Attempts")
+        .where('QuizId', isEqualTo: quiz.Id)
+        .where('StudentId', isEqualTo: stuId)
+        .get();
+    List<Attempt> attList = [];
+    for (var item in attSnap.docs) {
+      attList.add(Attempt.fromJson(item.data()));
+    }
+
+    if(attList.length == 0){
+      Fluttertoast.showToast(msg: "You have not attempted this quiz yet!");
+    }
+    else{
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+              (ViewResult(quiz))));
+    }
+    setState(() {
+      _isLoding = false;
+    });
   }
 
   Future<void> _showMyDialog(Quiz que) async {

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:projectvu/admin/AdminHome.dart';
 import 'package:projectvu/student/StudentHome.dart';
 import 'package:projectvu/utilities/UserData.dart';
 import 'package:projectvu/utilities/UserRole.dart';
@@ -55,8 +56,6 @@ class _splashScreenState extends State<splashScreenclass> {
     Timer(Duration(seconds: duration), screen_director);
   }
 
-
-
   screen_director() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     var role = _prefs.getString(UserData.role.toString().split('.').last);
@@ -69,7 +68,7 @@ class _splashScreenState extends State<splashScreenclass> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) => AdminUnverifiedAccountList()));
+              builder: (context) => AdminHome()));
 
     }
     else if (role == UserRole.Editor.toString().split('.').last){

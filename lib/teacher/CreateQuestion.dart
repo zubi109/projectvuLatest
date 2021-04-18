@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:projectvu/models/question.dart';
 import 'package:projectvu/models/quiz.dart';
 import 'package:projectvu/teacher/teacher_home.dart';
+import 'package:projectvu/utilities/GlobalProperties.dart';
 import 'package:projectvu/utilities/QuestionType.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -31,6 +32,7 @@ class _CreateQuestionState extends State<CreateQuestion> {
   int counter;
   List<Question> questions;
   Question que;
+  bool isLoading = false;
   _CreateQuestionState(Quiz quiz, int counter,List<Question> questions,Question que){
     newQuiz = quiz;
     this.counter = counter;
@@ -43,8 +45,8 @@ class _CreateQuestionState extends State<CreateQuestion> {
   String quesiontype;
   String quiznumber = "Quiz";
   String stringAnswer = '';
-bool _isTrue = false;
-void setAnswerForTrueFalse(bool value){
+  bool _isTrue = false;
+  void setAnswerForTrueFalse(bool value){
 setState(() {
   if(value)
   newQuestion.answer = "True";
@@ -60,6 +62,7 @@ setState(() {
   TextEditingController _option4Controller = TextEditingController(text: "option4");
   TextEditingController _questionMarksController = TextEditingController();
   TextEditingController _shortquestionController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   int answertype = 0, opstionNumber = 1;
 //  @override
@@ -133,60 +136,70 @@ setState(() {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
-         resizeToAvoidBottomInset: true,
-        appBar: AppBar(
-          backgroundColor: Colors.amber,
-          title: Row(children: [
-            Text('Create Question'),
-            Spacer(),
-            Text(counter.toString()),
-            Text('/'),
-            Text(newQuiz.NOQ.toString()),
-          ]),
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: _onWillPop,
+        child: Scaffold(
+           resizeToAvoidBottomInset: true,
+          appBar: AppBar(
+            backgroundColor: Colors.amber,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+              Text('Create Question'),
+              Text(counter.toString()+ "/" + newQuiz.NOQ.toString()),
+            ]),
 
-        ),
-        body: Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            color: Colors.grey,
+          ),
+          body: !isLoading 
+              ?Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.white,
 
-          child: SingleChildScrollView(
-            physics: AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.symmetric(horizontal: 0, vertical: 45),
-            child: Container(
-              child: Column(
-                  children: [
-                    NewQuestionTypes(),
-
-                    question(),
-
-                    setAnswers(),
-
-                    Container(
-                      alignment: Alignment.topCenter,
-                     // width: MediaQuery.of(context).size.width * .20,
-                      height: 110,
-                      width: 110,
-                      decoration: BoxDecoration(
-                        color: Colors.amber,
-                        border: Border.all(width: 1, color: Colors.blueAccent),
-                        borderRadius: BorderRadius.circular(60),
+            child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                    children: [
+                      Card(
+                          margin: EdgeInsets.fromLTRB(0,0,0,10),
+                          child: NewQuestionTypes()
                       ),
-                      child: Center(
+                      Card(
+                        margin: EdgeInsets.fromLTRB(0,0,0,20),
+                        child: Column(
+                          children: [
+                            question(),
+                            setAnswers(),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 150,
+                        margin: EdgeInsets.only(right: 20, bottom: 20),
                         child: TextFormField(
+                          validator: (value){
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter Marks';
+                            }
+                            if (!Global.isNumeric(value)) {
+                              return 'Invalid input!';
+                            }
+                            return null;
+                          },
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
+                          cursorColor: Colors.amber,
                           decoration: InputDecoration(
-                              counter: SizedBox(),
-                              //filled: true,
-                              //fillColor: Colors.white60,
-                              border: InputBorder.none,
-                              hintText: ' Marks  ',
-                              hintStyle: TextStyle( fontSize: 12),
-                              contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10)),
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey)),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.amber)),
+                            hintText: 'Marks',
+                          ),
                           onChanged: (marks) {
                             setState(() {});
                             // print(questionmarks);
@@ -194,112 +207,111 @@ setState(() {
                           controller: _questionMarksController,
                         ),
                       ),
-                    ),
-                    counter != newQuiz.NOQ
-                    ?GestureDetector(
-                      child: Container(
-                        height: 110,
-                        width: 110,
-                        decoration: BoxDecoration(
-                          color: Colors.amber,
-                          border: Border.all(width: 1, color: Colors.blueAccent),
-                          borderRadius: BorderRadius.circular(60),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Next",
-                            style: TextStyle(fontSize: 20.0 , fontWeight: FontWeight.bold, color: Colors.brown,),
-                          ),
-                        ),
-                      ),
-                      onTap: () {
-                        nextQuestion();
-                        // setState(() {
-                        //   // totalmarks = int.parse(_questionMarksController.text) + totalmarks;
-                        //   if(answertype==1){
-                        //     if(_questionController.text.isEmpty){
-                        //       return Fluttertoast.showToast(msg: 'Question is missing');
-                        //     }
-                        //     else  if(_option1Controller.text.isEmpty ){
-                        //       return  Fluttertoast.showToast(msg: 'option 1 is missing');
-                        //     }
-                        //     else  if(_option2Controller.text.isEmpty){
-                        //       return Fluttertoast.showToast(msg: 'option 2 is missing');
-                        //     }
-                        //     else  if(_option3Controller.text.isEmpty ){
-                        //       return  Fluttertoast.showToast(msg: 'option 3 is missing');
-                        //     }
-                        //     else  if(_option4Controller.text.isEmpty ){
-                        //       return Fluttertoast.showToast(msg: 'option 4 is missing');
-                        //     }
-                        //     else if(correct_answer==0){
-                        //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
-                        //     }
-                        //     else{
-                        //       quiz_maker_fairbase();
-                        //     }
-                        //   }
-                        //   if(answertype==2){
-                        //     stringAnswer=_shortquestionController.text;
-                        //     if(_questionController.text.isEmpty){
-                        //       return Fluttertoast.showToast(msg: 'Question is missing');
-                        //     }
-                        //     else  if(_option1Controller.text.isEmpty ){
-                        //       return   Fluttertoast.showToast(msg: 'option 1 is missing');
-                        //     }
-                        //     else  if(_option2Controller.text.isEmpty){
-                        //       return Fluttertoast.showToast(msg: 'option 2 is missing');
-                        //     }
-                        //     else if(stringAnswer=='Null'){
-                        //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
-                        //       quesion_number = quesion_number + 1;
-                        //     }
-                        //   else{
-                        //       quiz_maker_fairbase();
-                        //       quesion_number = quesion_number + 1;
-                        //     }
-                        //   }
-                        //   if(answertype==3){
-                        //     if(_questionController.text.isEmpty){
-                        //             return Fluttertoast.showToast(msg: 'Question is missing');}
-                        //     else if(_shortquestionController.text.isEmpty){
-                        //      return Fluttertoast.showToast(msg: 'Answer is missing');
-                        //     }
-                        //     else if(stringAnswer=='Null'){
-                        //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
-                        //       quesion_number = quesion_number + 1;
-                        //     }
-                        //     else{
-                        //       //stringAnswer=_shortquestionController.text;
-                        //       quiz_maker_fairbase();
-                        //     }
-                        //   }
-                        // });
-                      },
-                    ) //for Add question
-                    :GestureDetector(
-                  child: Container(
-                    height: 80,
-                    width: 80,
-                    margin:EdgeInsets.only(top: 20) ,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(width: 1, color: Colors.blueAccent),
-                      borderRadius: BorderRadius.circular(60),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Finish",
-                        style: TextStyle(fontSize: 16.0 , fontWeight: FontWeight.bold, color: Colors.brown,),
-                      ),
-                    ),
-                  ),
-                      onTap: (){
-                        finishQuiz();
-                      },
-                ), //for finish question
+                      counter != newQuiz.NOQ
+                      ?Row(children: [
+                        Expanded(
+                            child: Container(
+                              color: Colors.amber,
+                              height: 50,
+                              child: ElevatedButton(
+                                // primary: Colors.amber, // background
+                                  onPressed: () {
+                                    if (_formKey.currentState.validate()) {
+                                      if(quesiontype != QuestionType.MCQ.toString().split('.').last){
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text('Adding Question...'),
+                                          backgroundColor: Colors.amber,
+                                        ));
+                                        nextQuestion();
+                                      }
+                                      else{
+                                        if(newQuestion.answer == _option1Controller.text ||
+                                            newQuestion.answer == _option2Controller.text ||
+                                            newQuestion.answer == _option3Controller.text ||
+                                            newQuestion.answer == _option4Controller.text){
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                            content: Text('Adding Question...'),
+                                            backgroundColor: Colors.amber,
+                                          ));
+                                          nextQuestion();
+                                        }
+                                        else{
+                                          Fluttertoast.showToast(
+                                            msg: "Please select answer from available 4 options!",
+                                            backgroundColor: Colors.red
+                                          );
+                                        }
+                                      }
+                                    }
 
-              ]),
+                                  },
+                                  child: Text(
+                                    "Next",
+                                    style: TextStyle(fontSize: 22),
+                                  ),
+                                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.amber)
+                                  )
+                              ),
+                            ))
+                      ])
+                      :Row(children: [
+                        Expanded(
+                            child: Container(
+                              color: Colors.amber,
+                              height: 50,
+                              child: ElevatedButton(
+                                // primary: Colors.amber, // background
+                                  onPressed: () {
+                                    if (_formKey.currentState.validate()) {
+                                      if(quesiontype != QuestionType.MCQ.toString().split('.').last){
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text('Creating Quiz...'),
+                                          backgroundColor: Colors.amber,
+                                        ));
+                                        finishQuiz();
+                                      }
+                                      else{
+                                        if(newQuestion.answer == _option1Controller.text ||
+                                            newQuestion.answer == _option2Controller.text ||
+                                            newQuestion.answer == _option3Controller.text ||
+                                            newQuestion.answer == _option4Controller.text){
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                            content: Text('Creating Quiz...'),
+                                            backgroundColor: Colors.amber,
+                                          ));
+                                          createQuizeline();
+                                        }
+                                        else{
+                                          Fluttertoast.showToast(
+                                              msg: "Please select answer from available 4 options!",
+                                              backgroundColor: Colors.red
+                                          );
+                                        }
+                                      }
+                                    }
+                                  },
+                                  child: Text(
+                                    "Finish",
+                                    style: TextStyle(fontSize: 22),
+                                  ),
+                                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.amber)
+                                  )
+                              ),
+                            ))
+                      ]),//for finish question
+                ]),
+              ),
+            ),
+          )
+          :Center(
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.amber,
+              valueColor:
+              new AlwaysStoppedAnimation<Color>(Colors.white54),
             ),
           ),
         ),
@@ -323,39 +335,41 @@ setState(() {
   }
   Widget question() {
     return Container(
+      margin: EdgeInsets.only(left: 20, right: 20),
       height: 90,
-      margin: EdgeInsets.only(left: 10 ,right: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(100),
         color: Colors.white,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+
         children: [
           Text(
-            '\t\t Q ',
+            'Q ',
             style: TextStyle(
                 color: Colors.grey,
                 fontSize: 24,
                 fontWeight: FontWeight.bold),
           ),
           Expanded(
-            child: TextField(
+            child: TextFormField(
+              validator: (value){
+                if (value == null || value.isEmpty) {
+                  return 'Please enter the question';
+                }
+                return null;
+              },
+              cursorColor: Colors.amber,
               decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: 'Enter Your Question',
-                hintStyle: TextStyle(fontSize: 14.0, color: Colors.amber),
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey)),
+                focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber)),
+                hintText: 'Enter the Question',
               ),
               controller: _questionController,
             ),
           ),
-          // Text(
-          // 'Total_Marks  ' + totalmarks.toString(),
-          // style: TextStyle(
-          //   color: Colors.grey,
-          //   fontSize: 18,
-          //   fontWeight: FontWeight.w500),
-          // ),
         ],
       ),
     );
@@ -364,21 +378,36 @@ setState(() {
     return Column(
       children: <Widget>[
         Container(
-          height: 60,
-          width: 370,
-          margin: EdgeInsets.only(top: 7 ,left: 10 ,right: 10),
+          margin: EdgeInsets.only(left: 10 ,right: 20),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             color: Colors.white,
           ),
 
           child: ListTile(
-            title:  TextField(
-                      decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Enter 1st Option',
-                      hintStyle: TextStyle(fontSize: 14.0, color: Colors.amber),
-                    ),
+            title:  TextFormField(
+              validator: (value){
+                if(quesiontype != QuestionType.MCQ.toString().split('.').last){
+                  return null;
+                }
+                if (value == null || value.isEmpty) {
+                  return 'Please enter text for this option';
+                }
+                if(value == _option2Controller.text ||
+                value == _option3Controller.text ||
+                value == _option4Controller.text){
+                  return "Options can not be same";
+                }
+                return null;
+              },
+              cursorColor: Colors.amber,
+              decoration: InputDecoration(
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey)),
+                focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber)),
+                hintText: 'Enter first option',
+              ),
               controller: _option1Controller,
                   ),
             leading: Radio<String>(
@@ -393,19 +422,34 @@ setState(() {
           ),
         ),
         Container(
-          height: 60,
-          width: 370,
-          margin: EdgeInsets.only(top: 1 ,left: 10 ,right: 10),
+          margin: EdgeInsets.only(left: 10 ,right: 20),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             color: Colors.white,
           ),
           child: ListTile(
-            title: TextField(
+            title: TextFormField(
+              validator: (value){
+                if(quesiontype != QuestionType.MCQ.toString().split('.').last){
+                  return null;
+                }
+                if (value == null || value.isEmpty) {
+                  return 'Please enter text for this option';
+                }
+                if(value == _option1Controller.text ||
+                    value == _option3Controller.text ||
+                    value == _option4Controller.text){
+                  return "Options can not be same";
+                }
+                return null;
+              },
+              cursorColor: Colors.amber,
               decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: 'Enter 2nd Option',
-                hintStyle: TextStyle(fontSize: 14.0, color: Colors.amber),
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey)),
+                focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber)),
+                hintText: 'Enter second option',
               ),
               controller: _option2Controller,
             ),
@@ -421,19 +465,34 @@ setState(() {
           ),
         ),
         Container(
-          height: 60,
-          width: 370,
-          margin: EdgeInsets.only(top:1 ,left: 10 ,right: 10),
+          margin: EdgeInsets.only(left: 10 ,right: 20),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             color: Colors.white,
           ),
           child: ListTile(
-            title: TextField(
+            title: TextFormField(
+              validator: (value){
+                if(quesiontype != QuestionType.MCQ.toString().split('.').last){
+                  return null;
+                }
+                if (value == null || value.isEmpty) {
+                  return 'Please enter text for this option';
+                }
+                if(value == _option1Controller.text ||
+                    value == _option2Controller.text ||
+                    value == _option4Controller.text){
+                  return "Options can not be same";
+                }
+                return null;
+              },
+              cursorColor: Colors.amber,
               decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: 'Enter 3rd Option',
-                hintStyle: TextStyle(fontSize: 14.0, color: Colors.amber),
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey)),
+                focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber)),
+                hintText: 'Enter third option',
               ),
               controller: _option3Controller,
             ),
@@ -449,19 +508,34 @@ setState(() {
           ),
         ),
         Container(
-          height: 60,
-          width: 370,
-          margin: EdgeInsets.only(top:1 ,left: 10 ,right: 10 ,bottom: 19),
+          margin: EdgeInsets.only(left: 10 ,right: 20,bottom: 20 ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             color: Colors.white,
           ),
           child: ListTile(
-            title: TextField(
+            title: TextFormField(
+              validator: (value){
+                if(quesiontype != QuestionType.MCQ.toString().split('.').last){
+                  return null;
+                }
+                if (value == null || value.isEmpty) {
+                  return 'Please enter text for this option';
+                }
+                if(value == _option1Controller.text ||
+                    value == _option2Controller.text ||
+                    value == _option3Controller.text){
+                  return "Options can not be same";
+                }
+                return null;
+              },
+              cursorColor: Colors.amber,
               decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: 'Enter 4th Option',
-                hintStyle: TextStyle(fontSize: 14.0, color: Colors.amber),
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey)),
+                focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber)),
+                hintText: 'Enter forth option',
               ),
                 controller: _option4Controller,
             ),
@@ -481,9 +555,7 @@ setState(() {
   }
   Widget Short_Question_Buttonoption(){
     return Container(
-      height: 60,
-      width: 370,
-      margin: EdgeInsets.only(top:1 ,left: 10 ,right: 10 , bottom: 19),
+      margin: EdgeInsets.only(top:1 ,left: 20 ,right: 20 , bottom: 19),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
         color: Colors.white,
@@ -491,11 +563,23 @@ setState(() {
       child: Column(
         children: <Widget>[
           ListTile(
-            title:  TextField(
+            title:  TextFormField(
+              validator: (value){
+                if(quesiontype != QuestionType.ShortQuestion.toString().split('.').last){
+                  return null;
+                }
+                if (value == null || value.isEmpty) {
+                  return 'Please enter correct answer';
+                }
+                return null;
+              },
+              cursorColor: Colors.amber,
               decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: 'Enter Your Answer',
-                hintStyle: TextStyle(fontSize: 14.0, color: Colors.amber),
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey)),
+                focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber)),
+                hintText: 'Enter the Answer',
               ),
               controller: _shortquestionController,
             ),
@@ -618,7 +702,9 @@ setState(() {
   }
 
   void nextQuestion(){
-    // String uuid = GUIDGen.generate();
+    setState(() {
+      isLoading = true;
+    });
     var uuid = Uuid();
     newQuestion.id = uuid.v4();
     newQuestion.quizId = newQuiz.Id;
@@ -632,7 +718,9 @@ setState(() {
     if(newQuestion.type == QuestionType.ShortQuestion.toString().split('.').last){
       newQuestion.answer = _shortquestionController.text;
     }
-
+    setState(() {
+      isLoading = false;
+    });
     // questions.add(newQuestion);
     // counter++;
 
@@ -645,7 +733,9 @@ setState(() {
   }
 
   void finishQuiz(){
-
+    setState(() {
+      isLoading = true;
+    });
     var uuid = Uuid();
     newQuestion.id = uuid.v4();
     newQuestion.quizId = newQuiz.Id;
@@ -684,5 +774,8 @@ setState(() {
       ),
           (_) => false,
     );
+    setState(() {
+      isLoading = false;
+    });
   }
 }
