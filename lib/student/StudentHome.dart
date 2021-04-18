@@ -139,105 +139,107 @@ class _StudentHomeState extends State<StudentHome> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          backgroundColor: Colors.amber,
-          title:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            const Text('Quizzes List'),
-            SizedBox(),
-            InkWell(
-              child: Center(
-                child: Text(
-                  "Logout",
-                  style: TextStyle(fontSize: 16.0, color: Colors.white),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+            backgroundColor: Colors.amber,
+            title:
+                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              const Text('Quizzes List'),
+              SizedBox(),
+              InkWell(
+                child: Center(
+                  child: Text(
+                    "Logout",
+                    style: TextStyle(fontSize: 16.0, color: Colors.white),
+                  ),
                 ),
+                onTap: () async {
+                  setState(() {
+                    // FirebaseAuth.instance.signOut();
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => (Login())));
+                  });
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  prefs.setString(
+                      UserData.role.toString().split('.').last, "LoggedOut");
+                },
               ),
-              onTap: () async {
-                setState(() {
-                  // FirebaseAuth.instance.signOut();
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => (Login())));
-                });
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                prefs.setString(
-                    UserData.role.toString().split('.').last, "LoggedOut");
-              },
-            ),
-          ])),
-      body: _isLoding == false
-          ? ListView.builder(
-          shrinkWrap: true,
-          itemCount: quizzes == null ? 0 : quizzes.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Card(
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Text(
-                      quizzes[index].Title,
-                      style: TextStyle(
-                          fontSize: 20.0, color: Colors.black54),
-                    ),
-                    SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        InkWell(
-                          child: Center(
-                            child: Text(
-                              "View Quiz",
-                              style: TextStyle(
-                                  fontSize: 16.0, color: Colors.amber),
+            ])),
+        body: _isLoding == false
+            ? ListView.builder(
+            shrinkWrap: true,
+            itemCount: quizzes == null ? 0 : quizzes.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Card(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Text(
+                        quizzes[index].Title,
+                        style: TextStyle(
+                            fontSize: 20.0, color: Colors.black54),
+                      ),
+                      SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          InkWell(
+                            child: Center(
+                              child: Text(
+                                "View Quiz",
+                                style: TextStyle(
+                                    fontSize: 16.0, color: Colors.amber),
+                              ),
                             ),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                      (ViewQuiz(quizzes[index]))));
+                            },
                           ),
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                    (ViewQuiz(quizzes[index]))));
-                          },
-                        ),
-                        InkWell(
-                          child: Center(
-                            child: Text(
-                              "Attempt",
-                              style: TextStyle(
-                                  fontSize: 16.0, color: Colors.amber),
+                          InkWell(
+                            child: Center(
+                              child: Text(
+                                "Attempt",
+                                style: TextStyle(
+                                    fontSize: 16.0, color: Colors.amber),
+                              ),
                             ),
+                            onTap: () async {
+                              await attemptQuiz(quizzes[index]);
+                            },
                           ),
-                          onTap: () async {
-                            await attemptQuiz(quizzes[index]);
-                          },
-                        ),
-                        InkWell(
-                          child: Center(
-                            child: Text(
-                              "View Result",
-                              style: TextStyle(
-                                  fontSize: 16.0, color: Colors.amber),
+                          InkWell(
+                            child: Center(
+                              child: Text(
+                                "View Result",
+                                style: TextStyle(
+                                    fontSize: 16.0, color: Colors.amber),
+                              ),
                             ),
+                            onTap: () {
+                              initViewResult(quizzes[index]);
+                            },
                           ),
-                          onTap: () {
-                            initViewResult(quizzes[index]);
-                          },
-                        ),
-                      ],
-                    )
-                  ],
+                        ],
+                      )
+                    ],
+                  ),
                 ),
+              );
+            })
+            : Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.amber,
+                valueColor:
+                new AlwaysStoppedAnimation<Color>(Colors.white54),
               ),
-            );
-          })
-          : Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.amber,
-              valueColor:
-              new AlwaysStoppedAnimation<Color>(Colors.white54),
             ),
-          ),
+      ),
     );
   }
 

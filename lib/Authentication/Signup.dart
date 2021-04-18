@@ -26,17 +26,19 @@ class _signupState extends State<signup> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.amber,
-        centerTitle: true,
-        title: Text(
-          'Registration Form',
+    return SafeArea(
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.amber,
+          centerTitle: true,
+          title: Text(
+            'Registration Form',
+          ),
         ),
+        body: Card(margin: EdgeInsets.all(20), child: signUpFields()),
       ),
-      body: Card(margin: EdgeInsets.all(20), child: signUpFields()),
     );
   }
 //***********************************************************authentication_Sign_up********************************************************

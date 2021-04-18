@@ -86,20 +86,22 @@ class _ViewResultForAdminState extends State<ViewResultForAdmin> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.amber,
-        title: const Text('Quiz Result'),
-      ),
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
-      body: !isLoading
-          ?boddy()
-          :Center(
-        child: CircularProgressIndicator(
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
           backgroundColor: Colors.amber,
-          valueColor:
-          new AlwaysStoppedAnimation<Color>(Colors.white54),
+          title: const Text('Quiz Result'),
+        ),
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.white,
+        body: !isLoading
+            ?boddy()
+            :Center(
+          child: CircularProgressIndicator(
+            backgroundColor: Colors.amber,
+            valueColor:
+            new AlwaysStoppedAnimation<Color>(Colors.white54),
+          ),
         ),
       ),
     );

@@ -58,72 +58,74 @@ class _AdminHomeState extends State<AdminHome> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.amber,
-        title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children:[
-          const Text('Quizzes List'),
-          SizedBox(),
-          InkWell(
-            child: Center(
-              child: Text(
-                "Logout",
-                style: TextStyle(fontSize: 16.0, color: Colors.white),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.amber,
+          title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children:[
+            const Text('Quizzes List'),
+            SizedBox(),
+            InkWell(
+              child: Center(
+                child: Text(
+                  "Logout",
+                  style: TextStyle(fontSize: 16.0, color: Colors.white),
+                ),
               ),
+              onTap: () async {
+                setState(() {
+                  // FirebaseAuth.instance.signOut();
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => (Login())));
+                });
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setString(UserData.role.toString().split('.').last, "LoggedOut");
+              },
             ),
-            onTap: () async {
-              setState(() {
-                // FirebaseAuth.instance.signOut();
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => (Login())));
-              });
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setString(UserData.role.toString().split('.').last, "LoggedOut");
-            },
-          ),
-        ])
-      ),
-      body: _isLoding == false
-          ? ListView.builder(
-              shrinkWrap: true,
-              itemCount: quizzes == null ? 0 : quizzes.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Card(
-                  child: ListTile(
-                    title: FlatButton(
-                      color: counter_for_Quiz_number % 2 == 0
-                          ? Colors.amber
-                          : Colors.white12, //color: Colors.white,
-                      splashColor: Colors.white,
-                      onPressed: () {
-                        setState(() {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => (ViewQuizAttempts(
-                                      quizzes[index]))));
-                        });
-                      },
-                      child: Center(
-                        child: Text(
-                          quizzes[index].Title,
-                          style: TextStyle(
-                              fontSize: 20.0, color: Colors.black54),
+          ])
+        ),
+        body: _isLoding == false
+            ? ListView.builder(
+                shrinkWrap: true,
+                itemCount: quizzes == null ? 0 : quizzes.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                    child: ListTile(
+                      title: FlatButton(
+                        color: counter_for_Quiz_number % 2 == 0
+                            ? Colors.amber
+                            : Colors.white12, //color: Colors.white,
+                        splashColor: Colors.white,
+                        onPressed: () {
+                          setState(() {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => (ViewQuizAttempts(
+                                        quizzes[index]))));
+                          });
+                        },
+                        child: Center(
+                          child: Text(
+                            quizzes[index].Title,
+                            style: TextStyle(
+                                fontSize: 20.0, color: Colors.black54),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              })
-          : Center(
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.amber,
-                valueColor:
-                new AlwaysStoppedAnimation<Color>(Colors.white54),
+                  );
+                })
+            : Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.amber,
+                  valueColor:
+                  new AlwaysStoppedAnimation<Color>(Colors.white54),
+                ),
               ),
-            ),
+      ),
     );
   }
 }

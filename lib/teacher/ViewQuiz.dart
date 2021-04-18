@@ -50,14 +50,16 @@ class _ViewQuizState extends State<ViewQuiz> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.amber,
-        title: const Text('Quiz View'),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.amber,
+          title: const Text('Quiz View'),
+        ),
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.white,
+        body: boddy(),
       ),
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
-      body: boddy(),
     );
   }
 

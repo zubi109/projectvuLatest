@@ -149,157 +149,159 @@ class _AttemptQuizState extends State<AttemptQuiz> {
     context.watch<AttemptProvider>().context = context;
     DateTime time = new DateTime(2021, 0, 0, 0, 0, remainingTime, 0);
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        appBar: AppBar(
-          backwardsCompatibility: false,
-          backgroundColor: Colors.amber,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-            Flexible(
-              child: Text(
-                newQuiz.Title,
-                overflow: TextOverflow.fade,
-              ),
-              flex: 3,
-            ),
-            Text(counter.toString() + '/' + newQuiz.NOQ.toString()),
-          ]),
-        ),
-        body: !loading
-            ? SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 0, vertical: 45),
-                child: Container(
-                  child: Column(children: [
-                    Text("Time Left: " + DateFormat("HH:mm:ss").format(time)),
-                    question(questions[counter - 1]),
-                    setAnswers(questions[counter - 1]),
-                    counter != newQuiz.NOQ
-                        ? GestureDetector(
-                            child: Container(
-                              height: 110,
-                              width: 110,
-                              decoration: BoxDecoration(
-                                color: Colors.amber,
-                                border: Border.all(
-                                    width: 1, color: Colors.blueAccent),
-                                borderRadius: BorderRadius.circular(60),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Next",
-                                  style: TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.brown,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            onTap: () {
-                              nextQuestion(questions[counter - 1]);
-                              // setState(() {
-                              //   // totalmarks = int.parse(_questionMarksController.text) + totalmarks;
-                              //   if(answertype==1){
-                              //     if(_questionController.text.isEmpty){
-                              //       return Fluttertoast.showToast(msg: 'Question is missing');
-                              //     }
-                              //     else  if(_option1Controller.text.isEmpty ){
-                              //       return  Fluttertoast.showToast(msg: 'option 1 is missing');
-                              //     }
-                              //     else  if(_option2Controller.text.isEmpty){
-                              //       return Fluttertoast.showToast(msg: 'option 2 is missing');
-                              //     }
-                              //     else  if(_option3Controller.text.isEmpty ){
-                              //       return  Fluttertoast.showToast(msg: 'option 3 is missing');
-                              //     }
-                              //     else  if(_option4Controller.text.isEmpty ){
-                              //       return Fluttertoast.showToast(msg: 'option 4 is missing');
-                              //     }
-                              //     else if(correct_answer==0){
-                              //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
-                              //     }
-                              //     else{
-                              //       quiz_maker_fairbase();
-                              //     }
-                              //   }
-                              //   if(answertype==2){
-                              //     stringAnswer=_shortquestionController.text;
-                              //     if(_questionController.text.isEmpty){
-                              //       return Fluttertoast.showToast(msg: 'Question is missing');
-                              //     }
-                              //     else  if(_option1Controller.text.isEmpty ){
-                              //       return   Fluttertoast.showToast(msg: 'option 1 is missing');
-                              //     }
-                              //     else  if(_option2Controller.text.isEmpty){
-                              //       return Fluttertoast.showToast(msg: 'option 2 is missing');
-                              //     }
-                              //     else if(stringAnswer=='Null'){
-                              //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
-                              //       quesion_number = quesion_number + 1;
-                              //     }
-                              //   else{
-                              //       quiz_maker_fairbase();
-                              //       quesion_number = quesion_number + 1;
-                              //     }
-                              //   }
-                              //   if(answertype==3){
-                              //     if(_questionController.text.isEmpty){
-                              //             return Fluttertoast.showToast(msg: 'Question is missing');}
-                              //     else if(_shortquestionController.text.isEmpty){
-                              //      return Fluttertoast.showToast(msg: 'Answer is missing');
-                              //     }
-                              //     else if(stringAnswer=='Null'){
-                              //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
-                              //       quesion_number = quesion_number + 1;
-                              //     }
-                              //     else{
-                              //       //stringAnswer=_shortquestionController.text;
-                              //       quiz_maker_fairbase();
-                              //     }
-                              //   }
-                              // });
-                            },
-                          ) //for Add question
-                        : GestureDetector(
-                            child: Container(
-                              height: 80,
-                              width: 80,
-                              margin: EdgeInsets.only(top: 20),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                    width: 1, color: Colors.blueAccent),
-                                borderRadius: BorderRadius.circular(60),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Finish",
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.brown,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            onTap: () {
-                              finishQuiz(questions[counter - 1]);
-                            },
-                          ), //for finish question
-                  ]),
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: _onWillPop,
+        child: Scaffold(
+          resizeToAvoidBottomInset: true,
+          appBar: AppBar(
+            backwardsCompatibility: false,
+            backgroundColor: Colors.amber,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+              Flexible(
+                child: Text(
+                  newQuiz.Title,
+                  overflow: TextOverflow.fade,
                 ),
-              )
-            : Center(
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.amber,
-                valueColor:
-                    new AlwaysStoppedAnimation<Color>(Colors.white54),
+                flex: 3,
               ),
-            ),
+              Text(counter.toString() + '/' + newQuiz.NOQ.toString()),
+            ]),
+          ),
+          body: !loading
+              ? SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(horizontal: 0, vertical: 45),
+                  child: Container(
+                    child: Column(children: [
+                      Text("Time Left: " + DateFormat("HH:mm:ss").format(time)),
+                      question(questions[counter - 1]),
+                      setAnswers(questions[counter - 1]),
+                      counter != newQuiz.NOQ
+                          ? GestureDetector(
+                              child: Container(
+                                height: 110,
+                                width: 110,
+                                decoration: BoxDecoration(
+                                  color: Colors.amber,
+                                  border: Border.all(
+                                      width: 1, color: Colors.blueAccent),
+                                  borderRadius: BorderRadius.circular(60),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Next",
+                                    style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.brown,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              onTap: () {
+                                nextQuestion(questions[counter - 1]);
+                                // setState(() {
+                                //   // totalmarks = int.parse(_questionMarksController.text) + totalmarks;
+                                //   if(answertype==1){
+                                //     if(_questionController.text.isEmpty){
+                                //       return Fluttertoast.showToast(msg: 'Question is missing');
+                                //     }
+                                //     else  if(_option1Controller.text.isEmpty ){
+                                //       return  Fluttertoast.showToast(msg: 'option 1 is missing');
+                                //     }
+                                //     else  if(_option2Controller.text.isEmpty){
+                                //       return Fluttertoast.showToast(msg: 'option 2 is missing');
+                                //     }
+                                //     else  if(_option3Controller.text.isEmpty ){
+                                //       return  Fluttertoast.showToast(msg: 'option 3 is missing');
+                                //     }
+                                //     else  if(_option4Controller.text.isEmpty ){
+                                //       return Fluttertoast.showToast(msg: 'option 4 is missing');
+                                //     }
+                                //     else if(correct_answer==0){
+                                //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
+                                //     }
+                                //     else{
+                                //       quiz_maker_fairbase();
+                                //     }
+                                //   }
+                                //   if(answertype==2){
+                                //     stringAnswer=_shortquestionController.text;
+                                //     if(_questionController.text.isEmpty){
+                                //       return Fluttertoast.showToast(msg: 'Question is missing');
+                                //     }
+                                //     else  if(_option1Controller.text.isEmpty ){
+                                //       return   Fluttertoast.showToast(msg: 'option 1 is missing');
+                                //     }
+                                //     else  if(_option2Controller.text.isEmpty){
+                                //       return Fluttertoast.showToast(msg: 'option 2 is missing');
+                                //     }
+                                //     else if(stringAnswer=='Null'){
+                                //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
+                                //       quesion_number = quesion_number + 1;
+                                //     }
+                                //   else{
+                                //       quiz_maker_fairbase();
+                                //       quesion_number = quesion_number + 1;
+                                //     }
+                                //   }
+                                //   if(answertype==3){
+                                //     if(_questionController.text.isEmpty){
+                                //             return Fluttertoast.showToast(msg: 'Question is missing');}
+                                //     else if(_shortquestionController.text.isEmpty){
+                                //      return Fluttertoast.showToast(msg: 'Answer is missing');
+                                //     }
+                                //     else if(stringAnswer=='Null'){
+                                //       return Fluttertoast.showToast(msg: 'Correct Answer is missing');
+                                //       quesion_number = quesion_number + 1;
+                                //     }
+                                //     else{
+                                //       //stringAnswer=_shortquestionController.text;
+                                //       quiz_maker_fairbase();
+                                //     }
+                                //   }
+                                // });
+                              },
+                            ) //for Add question
+                          : GestureDetector(
+                              child: Container(
+                                height: 80,
+                                width: 80,
+                                margin: EdgeInsets.only(top: 20),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                      width: 1, color: Colors.blueAccent),
+                                  borderRadius: BorderRadius.circular(60),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Finish",
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.brown,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              onTap: () {
+                                finishQuiz(questions[counter - 1]);
+                              },
+                            ), //for finish question
+                    ]),
+                  ),
+                )
+              : Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.amber,
+                  valueColor:
+                      new AlwaysStoppedAnimation<Color>(Colors.white54),
+                ),
+              ),
+        ),
       ),
     );
   }

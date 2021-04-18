@@ -30,12 +30,14 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
-      body: Card(
-      margin: EdgeInsets.all(20),
-          child: loginpage()
+    return SafeArea(
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        backgroundColor: Colors.white,
+        body: Card(
+        margin: EdgeInsets.all(20),
+            child: loginpage()
+        ),
       ),
     );
   }

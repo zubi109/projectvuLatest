@@ -65,68 +65,70 @@ class _ViewQuizAttemptsState extends State<ViewQuizAttempts> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.amber,
-        title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children:[
-          const Text('Attempts List'),
-          SizedBox(),
-          InkWell(
-            child: Center(
-              child: Text(
-                "Logout",
-                style: TextStyle(fontSize: 16.0, color: Colors.white),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.amber,
+          title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children:[
+            const Text('Attempts List'),
+            SizedBox(),
+            InkWell(
+              child: Center(
+                child: Text(
+                  "Logout",
+                  style: TextStyle(fontSize: 16.0, color: Colors.white),
+                ),
               ),
+              onTap: () async {
+                setState(() {
+                  // FirebaseAuth.instance.signOut();
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => (Login())));
+                });
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setString(UserData.role.toString().split('.').last, "LoggedOut");
+              },
             ),
-            onTap: () async {
-              setState(() {
-                // FirebaseAuth.instance.signOut();
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => (Login())));
-              });
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setString(UserData.role.toString().split('.').last, "LoggedOut");
-            },
-          ),
-        ])
-      ),
-      body: _isLoding == false
-          ? ListView.builder(
-              shrinkWrap: true,
-              itemCount: attempts == null ? 0 : attempts.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Card(
-                  child: ListTile(
-                    title: FlatButton(
-                      onPressed: () {
-                        setState(() {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => (ViewResultForAdmin(
-                                      widget.quiz,attempts[index].Student.id))));
-                        });
-                      },
-                      child: Center(
-                        child: Text(
-                          attempts[index].Student.fullName,
-                          style: TextStyle(
-                              fontSize: 20.0, color: Colors.black54),
+          ])
+        ),
+        body: _isLoding == false
+            ? ListView.builder(
+                shrinkWrap: true,
+                itemCount: attempts == null ? 0 : attempts.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                    child: ListTile(
+                      title: FlatButton(
+                        onPressed: () {
+                          setState(() {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => (ViewResultForAdmin(
+                                        widget.quiz,attempts[index].Student.id))));
+                          });
+                        },
+                        child: Center(
+                          child: Text(
+                            attempts[index].Student.fullName,
+                            style: TextStyle(
+                                fontSize: 20.0, color: Colors.black54),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              })
-          : Center(
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.amber,
-                valueColor:
-                new AlwaysStoppedAnimation<Color>(Colors.white54),
+                  );
+                })
+            : Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.amber,
+                  valueColor:
+                  new AlwaysStoppedAnimation<Color>(Colors.white54),
+                ),
               ),
-            ),
+      ),
     );
   }
   
