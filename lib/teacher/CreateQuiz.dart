@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -36,7 +37,12 @@ class _CreateQuizState extends State<CreateQuiz> {
     // Provider.of<QuizProvider>(context);
   }
 
-  createQuizeline() {
+  createQuizeline() async{
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+      return;
+    }
   // asses the Quiz Model
     var uuid = Uuid(); // for set the uid
     var NewQuiz = new Quiz(

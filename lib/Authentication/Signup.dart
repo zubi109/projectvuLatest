@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -44,6 +45,11 @@ class _signupState extends State<signup> {
 //***********************************************************authentication_Sign_up********************************************************
 
   Future<void> authenticationsignup() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+      return;
+    }
     setState(() {
       isLoading = true;
     });

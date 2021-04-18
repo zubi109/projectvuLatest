@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -283,7 +284,7 @@ setState(() {
                                             content: Text('Creating Quiz...'),
                                             backgroundColor: Colors.amber,
                                           ));
-                                          createQuizeline();
+                                          finishQuiz();
                                         }
                                         else{
                                           Fluttertoast.showToast(
@@ -701,7 +702,12 @@ setState(() {
     );
   }
 
-  void nextQuestion(){
+  void nextQuestion()async{
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+      return;
+    }
     setState(() {
       isLoading = true;
     });
@@ -732,7 +738,12 @@ setState(() {
             )));
   }
 
-  void finishQuiz(){
+  void finishQuiz()async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+      return;
+    }
     setState(() {
       isLoading = true;
     });
@@ -756,8 +767,9 @@ setState(() {
       sum += element.marks;
     });
     newQuiz.TotalMarks = sum;
+    newQuiz.CreatedAt = DateTime.now();
     var quizJson = newQuiz.toJson();
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('Quizzes')
         .doc(newQuiz.Id)
         .set(quizJson).then((value) {
