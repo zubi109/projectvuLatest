@@ -153,18 +153,18 @@ class _ViewResultState extends State<ViewResult> {
                         Row(children: [
                           Text("Time Taken: ",
                               style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.amber)), //time
-                          Text("${DateFormat("HH:mm:ss").format(DateTime(2021, 0, 0, 0, 0, attempt.timeTaken, 0))}"),
+                          Text("${DateFormat("mm:ss").format(DateTime(2021, 0, 0, 0, 0, attempt.timeTaken, 0))}", style: TextStyle(fontSize: 14)),
                         ]),
                         Row(children: [
                           Text("Obtained Marks: ",
                               style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.amber)),
-                          Text("${attempt.marks}/${widget.quiz.TotalMarks}"),
+                          Text("${attempt.marks}/${widget.quiz.TotalMarks}", style: TextStyle(fontSize: 14)),
                         ]),
                       ],
                     ),
@@ -174,20 +174,20 @@ class _ViewResultState extends State<ViewResult> {
                         Row(children: [
                           Text("No. of Questions: ",
                               style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.amber)),
-                          Text("${widget.quiz.NOQ}"),
+                          Text("${widget.quiz.NOQ}", style: TextStyle(fontSize: 14)),
                         ]),
                         Row(children: [
                           Text("Attempts Count: ",
                               style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.amber)),
                           Text(attemptCount == null
                               ? "0/" + widget.quiz.AttemptsCount.toString()
-                              : attemptCount.toString() + "/" + widget.quiz.AttemptsCount.toString()),
+                              : attemptCount.toString() + "/" + widget.quiz.AttemptsCount.toString(), style: TextStyle(fontSize: 14)),
                         ]),
                       ],
                     ),

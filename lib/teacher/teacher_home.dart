@@ -107,9 +107,9 @@ class _TeacherHomeState extends State<TeacherHome> {
           .collection("Questions")
           .where('QuizId',isEqualTo: reference).get();
       for (var item in queSnap.docs) {
-        var que = Quiz.fromJson(item.data());
+        var que = Question.fromJson(item.data());
         await FirebaseFirestore.instance
-            .collection("Questions").doc(que.Id).delete();
+            .collection("Questions").doc(que.id).delete();
       }
     });
     var snap = await FirebaseFirestore.instance.collection("Quizzes").get();
