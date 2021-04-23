@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -69,18 +70,29 @@ class _StudentHomeState extends State<StudentHome> {
   }
 
   void initData() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+      return;
+    }
     setState(() {
       _isLoding = true;
     });
-    var snap = await FirebaseFirestore.instance.collection("Quizzes").get();
-    List<Quiz> list = [];
-    for (var item in snap.docs) {
-      list.add(Quiz.fromJson(item.data()));
+    try{
+      var snap = await FirebaseFirestore.instance.collection("Quizzes").orderBy('CreatedAt',descending: true).get();
+      List<Quiz> list = [];
+      for (var item in snap.docs) {
+        list.add(Quiz.fromJson(item.data()));
+      }
+      setState(() {
+        quizzes = list;
+        _isLoding = false;
+      });
+    } on Exception catch(e){
+      setState(() {
+        _isLoding = false;
+      });
     }
-    setState(() {
-      quizzes = list;
-      _isLoding = false;
-    });
   }
 
   void attemptQuiz(Quiz quiz) async {
@@ -135,6 +147,7 @@ class _StudentHomeState extends State<StudentHome> {
       timeTaken: 0,
       timeStamp: DateTime.now().toString(),
     );
+    attempt.CreatedAt = DateTime.now();
     var data = attempt.toJson();
 
     await FirebaseFirestore.instance
@@ -153,9 +166,9 @@ class _StudentHomeState extends State<StudentHome> {
         (context) => false,
       );
     });
-    setState(() {
-      _isLoding = false;
-    });
+    // setState(() {
+    //   _isLoding = false;
+    // });
   }
 
   @override
@@ -245,7 +258,12 @@ class _StudentHomeState extends State<StudentHome> {
                                             color: Colors.amber),
                                       ),
                                     ),
-                                    onTap: () {
+                                    onTap: () async {
+                                      var connectivityResult = await (Connectivity().checkConnectivity());
+                                      if (connectivityResult == ConnectivityResult.none) {
+                                        Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+                                        return;
+                                      }
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
@@ -263,6 +281,11 @@ class _StudentHomeState extends State<StudentHome> {
                                       ),
                                     ),
                                     onTap: () async {
+                                      var connectivityResult = await (Connectivity().checkConnectivity());
+                                      if (connectivityResult == ConnectivityResult.none) {
+                                        Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+                                        return;
+                                      }
                                       await attemptQuiz(quizzes[index]);
                                     },
                                   ),
@@ -275,7 +298,12 @@ class _StudentHomeState extends State<StudentHome> {
                                             color: Colors.amber),
                                       ),
                                     ),
-                                    onTap: () {
+                                    onTap: () async {
+                                      var connectivityResult = await (Connectivity().checkConnectivity());
+                                      if (connectivityResult == ConnectivityResult.none) {
+                                        Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+                                        return;
+                                      }
                                       initViewResult(quizzes[index]);
                                     },
                                   ),
@@ -352,7 +380,12 @@ class _StudentHomeState extends State<StudentHome> {
             TextButton(
               child: Text('Start',
                   style: TextStyle(color: Colors.amber, fontSize: 16)),
-              onPressed: () {
+              onPressed: () async{
+                var connectivityResult = await (Connectivity().checkConnectivity());
+                if (connectivityResult == ConnectivityResult.none) {
+                  Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+                  return;
+                }
                 initAttempt(que);
               },
             )

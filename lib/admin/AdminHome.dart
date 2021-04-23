@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:projectvu/Authentication/Login.dart';
 import 'package:projectvu/admin/ViewQuizAttempts.dart';
 import 'package:projectvu/models/question.dart';
@@ -54,18 +56,29 @@ class _AdminHomeState extends State<AdminHome> {
   }
 
   void initData() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+      return;
+    }
     setState(() {
       _isLoding = true;
     });
-    var snap = await FirebaseFirestore.instance.collection("Quizzes").get();
-    List<Quiz> list = [];
-    for (var item in snap.docs) {
-      list.add(Quiz.fromJson(item.data()));
+    try{
+      var snap = await FirebaseFirestore.instance.collection("Quizzes").orderBy('CreatedAt',descending: true).get();
+      List<Quiz> list = [];
+      for (var item in snap.docs) {
+        list.add(Quiz.fromJson(item.data()));
+      }
+      setState(() {
+        quizzes = list;
+        _isLoding = false;
+      });
+    } on Exception catch(e){
+      setState(() {
+        _isLoding = false;
+      });
     }
-    setState(() {
-      quizzes = list;
-      _isLoding = false;
-    });
   }
 
   @override

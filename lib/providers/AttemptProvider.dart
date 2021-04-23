@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:projectvu/models/answer.dart';
 import 'package:projectvu/models/attempt.dart';
@@ -115,9 +117,15 @@ class AttemptProvider with ChangeNotifier {
   }
 
   void finishQuiz() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+      SystemNavigator.pop();
+    }
     AttemptQuizLoading = true;
     attempt.timeStamp = DateTime.now().toString();
     attempt.timeTaken = quiz.TimeLimit - RemainingTime;
+    attempt.CreatedAt = DateTime.now();
     var attemptJson = attempt.toJson();
     await FirebaseFirestore.instance.collection("Attempts")
         .doc(attempt.id).set(attemptJson).then((value) {

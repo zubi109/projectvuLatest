@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 @JsonSerializable()
@@ -9,6 +10,7 @@ class Quiz {
   int AttemptsCount;
   int NOQ;
   int TimeLimit;
+  DateTime CreatedAt;
 
   Quiz(
       {this.Id,
@@ -27,6 +29,8 @@ class Quiz {
     AttemptsCount = json['AttemptsCount'];
     Description = json['Description'];
     NOQ = json['NOQ'];
+    Timestamp myTimeStamp = json['CreatedAt'];
+    CreatedAt = myTimeStamp.toDate();
   }
 
   Map<String, dynamic> toJson() {
@@ -38,6 +42,7 @@ class Quiz {
     data['AttemptsCount'] = this.AttemptsCount;
     data['Description'] = this.Description;
     data['NOQ'] = this.NOQ;
+    data['CreatedAt'] = Timestamp.fromDate(this.CreatedAt);
     return data;
   }
 }

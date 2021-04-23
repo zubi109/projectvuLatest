@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -217,19 +218,8 @@ setState(() {
                                 // primary: Colors.amber, // background
                                   onPressed: () {
                                     if (_formKey.currentState.validate()) {
-                                      if(quesiontype != QuestionType.MCQ.toString().split('.').last){
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                          content: Text('Adding Question...'),
-                                          backgroundColor: Colors.amber,
-                                        ));
-                                        nextQuestion();
-                                      }
-                                      else{
-                                        if(newQuestion.answer == _option1Controller.text ||
-                                            newQuestion.answer == _option2Controller.text ||
-                                            newQuestion.answer == _option3Controller.text ||
-                                            newQuestion.answer == _option4Controller.text){
+                                      if(quesiontype != null){
+                                        if(quesiontype != QuestionType.MCQ.toString().split('.').last){
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
                                             content: Text('Adding Question...'),
@@ -238,11 +228,30 @@ setState(() {
                                           nextQuestion();
                                         }
                                         else{
-                                          Fluttertoast.showToast(
-                                            msg: "Please select answer from available 4 options!",
-                                            backgroundColor: Colors.red
-                                          );
+                                          if(newQuestion.answer == _option1Controller.text ||
+                                              newQuestion.answer == _option2Controller.text ||
+                                              newQuestion.answer == _option3Controller.text ||
+                                              newQuestion.answer == _option4Controller.text){
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                              content: Text('Adding Question...'),
+                                              backgroundColor: Colors.amber,
+                                            ));
+                                            nextQuestion();
+                                          }
+                                          else{
+                                            Fluttertoast.showToast(
+                                                msg: "Please select answer from available 4 options!",
+                                                backgroundColor: Colors.red
+                                            );
+                                          }
                                         }
+                                      }
+                                      else{
+                                        Fluttertoast.showToast(
+                                            msg: "Please select question type from available options!",
+                                            backgroundColor: Colors.red
+                                        );
                                       }
                                     }
 
@@ -265,32 +274,40 @@ setState(() {
                                 // primary: Colors.amber, // background
                                   onPressed: () {
                                     if (_formKey.currentState.validate()) {
-                                      if(quesiontype != QuestionType.MCQ.toString().split('.').last){
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                          content: Text('Creating Quiz...'),
-                                          backgroundColor: Colors.amber,
-                                        ));
-                                        finishQuiz();
-                                      }
-                                      else{
-                                        if(newQuestion.answer == _option1Controller.text ||
-                                            newQuestion.answer == _option2Controller.text ||
-                                            newQuestion.answer == _option3Controller.text ||
-                                            newQuestion.answer == _option4Controller.text){
+                                      if(quesiontype != null){
+                                        if(quesiontype != QuestionType.MCQ.toString().split('.').last){
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
                                             content: Text('Creating Quiz...'),
                                             backgroundColor: Colors.amber,
                                           ));
-                                          createQuizeline();
+                                          finishQuiz();
                                         }
                                         else{
-                                          Fluttertoast.showToast(
-                                              msg: "Please select answer from available 4 options!",
-                                              backgroundColor: Colors.red
-                                          );
+                                          if(newQuestion.answer == _option1Controller.text ||
+                                              newQuestion.answer == _option2Controller.text ||
+                                              newQuestion.answer == _option3Controller.text ||
+                                              newQuestion.answer == _option4Controller.text){
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                              content: Text('Creating Quiz...'),
+                                              backgroundColor: Colors.amber,
+                                            ));
+                                            finishQuiz();
+                                          }
+                                          else{
+                                            Fluttertoast.showToast(
+                                                msg: "Please select answer from available 4 options!",
+                                                backgroundColor: Colors.red
+                                            );
+                                          }
                                         }
+                                      }
+                                      else{
+                                        Fluttertoast.showToast(
+                                            msg: "Please select question type from available options!",
+                                            backgroundColor: Colors.red
+                                        );
                                       }
                                     }
                                   },
@@ -701,7 +718,12 @@ setState(() {
     );
   }
 
-  void nextQuestion(){
+  void nextQuestion()async{
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+      return;
+    }
     setState(() {
       isLoading = true;
     });
@@ -732,7 +754,12 @@ setState(() {
             )));
   }
 
-  void finishQuiz(){
+  void finishQuiz()async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+      return;
+    }
     setState(() {
       isLoading = true;
     });
@@ -756,8 +783,9 @@ setState(() {
       sum += element.marks;
     });
     newQuiz.TotalMarks = sum;
+    newQuiz.CreatedAt = DateTime.now();
     var quizJson = newQuiz.toJson();
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('Quizzes')
         .doc(newQuiz.Id)
         .set(quizJson).then((value) {

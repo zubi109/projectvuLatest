@@ -1,5 +1,7 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:projectvu/models/answer.dart';
 import 'package:projectvu/models/attempt.dart';
 import 'package:projectvu/models/question.dart';
@@ -38,6 +40,11 @@ class _ViewResultForAdminState extends State<ViewResultForAdmin> {
   }
 
   void initData() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+      return;
+    }
     setState(() {
       isLoading = true;
     });
@@ -143,18 +150,21 @@ class _ViewResultForAdminState extends State<ViewResultForAdmin> {
                         Row(children: [
                           Text("Time Taken: ",
                               style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.amber)), //time
-                          Text("${DateFormat("HH:mm:ss").format(DateTime(2021, 0, 0, 0, 0, attempt.timeTaken, 0))}"),
+                          Text(
+                              "${DateFormat("mm:ss").format(DateTime(2021, 0, 0, 0, 0, attempt.timeTaken, 0))}",
+                                  style: TextStyle(fontSize: 14),
+                          ),
                         ]),
                         Row(children: [
                           Text("Obtained Marks: ",
                               style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.amber)),
-                          Text("${attempt.marks}/${widget.quiz.TotalMarks}"),
+                          Text("${attempt.marks}/${widget.quiz.TotalMarks}",style: TextStyle(fontSize: 14)),
                         ]),
                       ],
                     ),
@@ -164,20 +174,20 @@ class _ViewResultForAdminState extends State<ViewResultForAdmin> {
                         Row(children: [
                           Text("No. of Questions: ",
                               style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.amber)),
-                          Text("${widget.quiz.NOQ}"),
+                          Text("${widget.quiz.NOQ}",style: TextStyle(fontSize: 14)),
                         ]),
                         Row(children: [
                           Text("Attempts Count: ",
                               style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.amber)),
                           Text(attemptCount == null
                               ? "0/" + widget.quiz.AttemptsCount.toString()
-                              : attemptCount.toString() + "/" + widget.quiz.AttemptsCount.toString()),
+                              : attemptCount.toString() + "/" + widget.quiz.AttemptsCount.toString(),style: TextStyle(fontSize: 14)),
                         ]),
                       ],
                     ),

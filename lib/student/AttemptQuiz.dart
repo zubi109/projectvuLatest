@@ -1,7 +1,9 @@
 import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:projectvu/models/answer.dart';
 import 'package:projectvu/models/question.dart';
 import 'package:projectvu/providers/AttemptProvider.dart';
@@ -95,6 +97,11 @@ class _AttemptQuizState extends State<AttemptQuiz> {
   }
 
   Future<bool> _onWillPop() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+      return false;
+    }
     var count = context.read<AttemptProvider>().Counter;
     if (count == 1) {
       await _showMyDialog();
@@ -106,6 +113,7 @@ class _AttemptQuizState extends State<AttemptQuiz> {
       var ans = answers[counter - 2];
       attempt.marks -= ans.marks;
       attempt.timeStamp = DateTime.now().toString();
+      attempt.CreatedAt = DateTime.now();
 
       var attJson = attempt.toJson();
       await FirebaseFirestore.instance.collection("Attempts")
@@ -446,7 +454,12 @@ class _AttemptQuizState extends State<AttemptQuiz> {
     );
   }
 
-  void nextQuestion(Question que) {
+  void nextQuestion(Question que) async{
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+      return;
+    }
     context.read<AttemptProvider>().AttemptQuizLoading = true;
     var attempt = context.read<AttemptProvider>().attempt;
     var uuid = Uuid();
@@ -463,14 +476,15 @@ class _AttemptQuizState extends State<AttemptQuiz> {
     }
     attempt.marks += ans.marks;
     attempt.timeStamp = DateTime.now().toString();
+    attempt.CreatedAt = DateTime.now();
     var ansJson = ans.toJson();
     var attemptJson = attempt.toJson();
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection("Answers")
         .doc(ans.id)
         .set(ansJson)
-        .then((value) {
-      FirebaseFirestore.instance
+        .then((value) async{
+      await FirebaseFirestore.instance
           .collection("Attempts")
           .doc(attempt.id)
           .set(attemptJson)
@@ -478,15 +492,6 @@ class _AttemptQuizState extends State<AttemptQuiz> {
         context.read<AttemptProvider>().attempt = attempt;
 
         context.read<AttemptProvider>().Answers.add(ans);
-        // var answers = context.read<AttemptProvider>().Answers;
-        // if(answers.any((element) => element.id == ans.id)){
-        //    var item = answers.where((element) => element.id == ans.id).first;
-        //    var index = answers.indexOf(item);
-        //    context.read<AttemptProvider>().Answers[index] = ans;
-        // }
-        // else{
-        //   context.read<AttemptProvider>().Answers.add(ans);
-        // }
 
         context.read<AttemptProvider>().Counter++;
         context.read<AttemptProvider>().AttemptQuizLoading = false;
@@ -494,28 +499,14 @@ class _AttemptQuizState extends State<AttemptQuiz> {
             context, MaterialPageRoute(builder: (context) => AttemptQuiz()));
       });
     });
-    // newQuestion.id = uuid.v4();
-    // newQuestion.quizId = newQuiz.Id;
-    // newQuestion.type = quesiontype;
-    // newQuestion.marks = int.parse(_questionMarksController.text);
-    // newQuestion.option1 = _option1Controller.text;
-    // newQuestion.option2 = _option2Controller.text;
-    // newQuestion.option3 = _option3Controller.text;
-    // newQuestion.option4 = _option4Controller.text;
-    // newQuestion.title = _questionController.text;
-    // if(newQuestion.type == QuestionType.ShortQuestion.toString().split('.').last){
-    //   newQuestion.answer = _shortquestionController.text;
-    // }
-    //
-    // Navigator.push(
-    //     context,
-    //     MaterialPageRoute(
-    //         builder: (context) => AttemptQuiz(
-    //             newQuiz, counter,questions,newQuestion
-    //         )));
   }
 
-  void finishQuiz(Question que) {
+  void finishQuiz(Question que) async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+      return;
+    }
     context.read<AttemptProvider>().AttemptQuizLoading = true;
     var attempt = context.read<AttemptProvider>().attempt;
     var remTime = context.read<AttemptProvider>().RemainingTime;
@@ -535,14 +526,15 @@ class _AttemptQuizState extends State<AttemptQuiz> {
     attempt.marks += ans.marks;
     attempt.timeStamp = DateTime.now().toString();
     attempt.timeTaken = quiz.TimeLimit - remTime;
+    attempt.CreatedAt = DateTime.now();
     var ansJson = ans.toJson();
     var attemptJson = attempt.toJson();
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection("Answers")
         .doc(ans.id)
         .set(ansJson)
-        .then((value) {
-      FirebaseFirestore.instance
+        .then((value) async {
+      await FirebaseFirestore.instance
           .collection("Attempts")
           .doc(attempt.id)
           .set(attemptJson)
@@ -551,8 +543,6 @@ class _AttemptQuizState extends State<AttemptQuiz> {
 
         context.read<AttemptProvider>().Answers.add(ans);
 
-        // context.read<AttemptProvider>().Counter++;
-        // context.read<AttemptProvider>().AttemptQuizLoading = false;
         context.read<AttemptProvider>().timer.cancel();
 
         Navigator.of(context).pushAndRemoveUntil(

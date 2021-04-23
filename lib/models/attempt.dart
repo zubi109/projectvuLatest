@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:projectvu/models/User.dart';
 
@@ -10,6 +11,7 @@ class Attempt {
   String timeStamp;
   String quizId;
   QCUser Student;
+  DateTime CreatedAt;
 
   Attempt(
       {this.marks,
@@ -26,6 +28,8 @@ class Attempt {
     timeTaken = json['TimeTaken'];
     timeStamp = json['TimeStamp'];
     quizId = json['QuizId'];
+    Timestamp myTimeStamp = json['CreatedAt'];
+    CreatedAt = myTimeStamp.toDate();
   }
 
   Map<String, dynamic> toJson() {
@@ -36,6 +40,7 @@ class Attempt {
     data['TimeTaken'] = this.timeTaken;
     data['TimeStamp'] = this.timeStamp;
     data['QuizId'] = this.quizId;
+    data['CreatedAt'] = Timestamp.fromDate(this.CreatedAt);
     return data;
   }
 }

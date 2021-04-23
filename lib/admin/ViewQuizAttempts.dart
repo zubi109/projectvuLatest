@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:projectvu/Authentication/Login.dart';
 import 'package:projectvu/admin/ViewResultForAdmin.dart';
 import 'package:projectvu/models/User.dart';
@@ -54,34 +56,45 @@ class _ViewQuizAttemptsState extends State<ViewQuizAttempts> {
   }
 
   void initData() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+      return;
+    }
     setState(() {
       _isLoding = true;
     });
-    var snap = await FirebaseFirestore.instance
-        .collection("Attempts")
-        .where("QuizId", isEqualTo: widget.quiz.Id)
-        .get();
-    List<Attempt> list = [];
-    for (var item in snap.docs) {
-      var att = Attempt.fromJson(item.data());
-      if (list.any((element) => element.studentId == att.studentId)) {
-        var oldAtt =
-            list.where((element) => element.studentId == att.studentId).first;
-        var compare = oldAtt.timeStamp.compareTo(att.timeStamp);
-        if (compare < 0) {
-          var index = list.indexOf(oldAtt);
+    try{
+      var snap = await FirebaseFirestore.instance
+          .collection("Attempts")
+          .where("QuizId", isEqualTo: widget.quiz.Id)
+          .get();
+      List<Attempt> list = [];
+      for (var item in snap.docs) {
+        var att = Attempt.fromJson(item.data());
+        if (list.any((element) => element.studentId == att.studentId)) {
+          var oldAtt =
+              list.where((element) => element.studentId == att.studentId).first;
+          var compare = oldAtt.timeStamp.compareTo(att.timeStamp);
+          if (compare < 0) {
+            var index = list.indexOf(oldAtt);
+            att.Student = await getStudent(att);
+            list[index] = att;
+          }
+        } else {
           att.Student = await getStudent(att);
-          list[index] = att;
+          list.add(att);
         }
-      } else {
-        att.Student = await getStudent(att);
-        list.add(att);
       }
+      setState(() {
+        attempts = list;
+        _isLoding = false;
+      });
+    } on Exception catch(e){
+      setState(() {
+        _isLoding = false;
+      });
     }
-    setState(() {
-      attempts = list;
-      _isLoding = false;
-    });
   }
 
   @override
