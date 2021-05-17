@@ -21,7 +21,7 @@ class CreateQuiz extends StatefulWidget {
 
 class _CreateQuizState extends State<CreateQuiz> {
   TextEditingController _nameController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
+ // TextEditingController _descriptionController = TextEditingController();
   TextEditingController _numberofQuestionController = TextEditingController();
   TextEditingController _timeLimitController = TextEditingController();
   TextEditingController _attemptsCountController = TextEditingController();
@@ -37,18 +37,18 @@ class _CreateQuizState extends State<CreateQuiz> {
     // Provider.of<QuizProvider>(context);
   }
 
-  createQuizeline() async{
+  createQuizeline() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.none) {
       Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
       return;
     }
-  // asses the Quiz Model
+    // asses the Quiz Model
     var uuid = Uuid(); // for set the uid
     var NewQuiz = new Quiz(
       Id: uuid.v4(),
       Title: _nameController.text,
-      Description: _descriptionController.text,
+   //   Description: _descriptionController.text,
       AttemptsCount: int.parse(_attemptsCountController.text),
       NOQ: int.parse(_numberofQuestionController.text),
       TimeLimit: int.parse(_timeLimitController.text),
@@ -59,9 +59,8 @@ class _CreateQuizState extends State<CreateQuiz> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => CreateQuestion(
-                  NewQuiz, QueCounter,questions, question
-                )));
+            builder: (context) =>
+                CreateQuestion(NewQuiz, QueCounter, questions, question)));
   }
 
   @override
@@ -84,21 +83,21 @@ class _CreateQuizState extends State<CreateQuiz> {
                 ),
               )
             : Center(
-              child: Card(
-                margin: EdgeInsets.only(left: 20 , right: 20),
-                child: SingleChildScrollView(
-          physics: AlwaysScrollableScrollPhysics(),
-          padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                  child: Form(
-                    key: _formKey,
-                    child: Container(
+                child: Card(
+                  margin: EdgeInsets.only(left: 20, right: 20),
+                  child: SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                    child: Form(
+                      key: _formKey,
+                      child: Container(
                         padding: EdgeInsets.all(20),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             TextFormField(
-                              validator: (value){
+                              validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter some text';
                                 }
@@ -110,7 +109,8 @@ class _CreateQuizState extends State<CreateQuiz> {
                                 enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(color: Colors.grey)),
                                 focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.amber)),
+                                    borderSide:
+                                        BorderSide(color: Colors.amber)),
                                 hintText: 'Quiz Name',
                               ),
                               controller: _nameController,
@@ -119,7 +119,7 @@ class _CreateQuizState extends State<CreateQuiz> {
                               height: 20,
                             ),
                             TextFormField(
-                              validator: (value){
+                              validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter no. of questions';
                                 }
@@ -138,18 +138,18 @@ class _CreateQuizState extends State<CreateQuiz> {
                                 enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(color: Colors.grey)),
                                 focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.amber)),
+                                    borderSide:
+                                        BorderSide(color: Colors.amber)),
                                 hintText: 'No. of Questions',
-                               // keyboardType: TextInputType.numberWithOptions(decimal: true),
-
+                                // keyboardType: TextInputType.numberWithOptions(decimal: true),
                               ),
                               controller: _numberofQuestionController,
-                            ),//number of qestion
+                            ), //number of qestion
                             SizedBox(
                               height: 20,
                             ),
                             TextFormField(
-                              validator: (value){
+                              validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter time limit';
                                 }
@@ -164,7 +164,8 @@ class _CreateQuizState extends State<CreateQuiz> {
                                 enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(color: Colors.grey)),
                                 focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.amber)),
+                                    borderSide:
+                                        BorderSide(color: Colors.amber)),
                                 hintText: 'Time Limit (seconds)',
                               ),
                               controller: _timeLimitController,
@@ -173,7 +174,7 @@ class _CreateQuizState extends State<CreateQuiz> {
                               height: 20,
                             ),
                             TextFormField(
-                              validator: (value){
+                              validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter no. of allowed attempts per student';
                                 }
@@ -188,7 +189,8 @@ class _CreateQuizState extends State<CreateQuiz> {
                                 enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(color: Colors.grey)),
                                 focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.amber)),
+                                    borderSide:
+                                        BorderSide(color: Colors.amber)),
                                 hintText: 'Allowed Attempts',
                               ),
                               controller: _attemptsCountController,
@@ -206,38 +208,39 @@ class _CreateQuizState extends State<CreateQuiz> {
                             Row(children: [
                               Expanded(
                                   child: Container(
-                                    color: Colors.amber,
+                                color: Colors.amber,
                                 height: 50,
                                 child: ElevatedButton(
-                                 // primary: Colors.amber, // background
-                                  onPressed: () {
-                                    if (_formKey.currentState.validate()) {
-                                      // If the form is valid, display a snackbar. In the real world,
-                                      // you'd often call a server or save the information in a database.
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(
-                                        content: Text('Creating Quiz...'),
-                                        backgroundColor: Colors.amber,
-                                      ));
-                                      createQuizeline();
-                                    }
-                                  },
-                                  child: Text(
-                                    "Next",
-                                    style: TextStyle(fontSize: 22),
-                                  ),
-                                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.amber)
-                                  )
-                                ),
+                                    // primary: Colors.amber, // background
+                                    onPressed: () {
+                                      if (_formKey.currentState.validate()) {
+                                        // If the form is valid, display a snackbar. In the real world,
+                                        // you'd often call a server or save the information in a database.
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text('Creating Quiz...'),
+                                          backgroundColor: Colors.amber,
+                                        ));
+                                        createQuizeline();
+                                      }
+                                    },
+                                    child: Text(
+                                      "Next",
+                                      style: TextStyle(fontSize: 22),
+                                    ),
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.amber))),
                               ))
                             ]),
                           ],
                         ),
                       ),
+                    ),
                   ),
                 ),
               ),
-            ),
       ),
     );
   }

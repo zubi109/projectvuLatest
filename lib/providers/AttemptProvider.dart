@@ -127,8 +127,11 @@ class AttemptProvider with ChangeNotifier {
     attempt.timeTaken = quiz.TimeLimit - RemainingTime;
     attempt.CreatedAt = DateTime.now();
     var attemptJson = attempt.toJson();
-    await FirebaseFirestore.instance.collection("Attempts")
-        .doc(attempt.id).set(attemptJson).then((value) {
+    await FirebaseFirestore.instance
+        .collection("Attempts")
+        .doc(attempt.id)
+        .set(attemptJson)
+        .then((value) {
       Counter++;
       AttemptQuizLoading = false;
       Fluttertoast.showToast(msg: "Time is over. Quiz has been submitted");
@@ -136,7 +139,7 @@ class AttemptProvider with ChangeNotifier {
         MaterialPageRoute(
           builder: (context) => StudentHome(),
         ),
-            (context) => false,
+        (context) => false,
       );
       Fluttertoast.showToast(msg: "Time is over. Quiz has been submitted");
     });

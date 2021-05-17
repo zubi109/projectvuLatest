@@ -11,7 +11,6 @@ import 'package:projectvu/utilities/UserRole.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Authentication/Login.dart';
-import 'admin/admin_unverified_account.dart';
 import 'teacher/teacher_home.dart';
 
 class splashScreenclass extends StatefulWidget {
@@ -61,27 +60,17 @@ class _splashScreenState extends State<splashScreenclass> {
     var role = _prefs.getString(UserData.role.toString().split('.').last);
     // var isLoggedIn = _prefs.getBool("IsLoggedIn");
     if (role == UserRole.Student.toString().split('.').last) {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => StudentHome()));
-    }
-    else if (role == UserRole.Admin.toString().split('.').last) {
       Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => AdminHome()));
-
-    }
-    else if (role == UserRole.Editor.toString().split('.').last){
+          context, MaterialPageRoute(builder: (context) => StudentHome()));
+    } else if (role == UserRole.Admin.toString().split('.').last) {
       Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => TeacherHome()));
-    }
-    else{
+          context, MaterialPageRoute(builder: (context) => AdminHome()));
+    } else if (role == UserRole.Editor.toString().split('.').last) {
       Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => Login()));
-    }
+          context, MaterialPageRoute(builder: (context) => TeacherHome()));
+    } else {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => Login()));
     }
   }
+}

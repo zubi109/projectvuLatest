@@ -30,7 +30,6 @@ class TeacherHome extends StatefulWidget {
 }
 
 class _TeacherHomeState extends State<TeacherHome> {
-
   bool _isLoding = false;
   List<Quiz> quizzes = [];
   List<Question> questions = [];
@@ -38,7 +37,7 @@ class _TeacherHomeState extends State<TeacherHome> {
   int counter_for_Quiz_number = 1;
 
   RefreshController _refreshController =
-  RefreshController(initialRefresh: false);
+      RefreshController(initialRefresh: false);
 
   void _onRefresh() async {
     // monitor network fetch
@@ -73,8 +72,11 @@ class _TeacherHomeState extends State<TeacherHome> {
     setState(() {
       _isLoding = true;
     });
-    try{
-      var snap = await FirebaseFirestore.instance.collection("Quizzes").orderBy('CreatedAt',descending: true).get();
+    try {
+      var snap = await FirebaseFirestore.instance
+          .collection("Quizzes")
+          .orderBy('CreatedAt', descending: true)
+          .get();
       List<Quiz> list = [];
       for (var item in snap.docs) {
         list.add(Quiz.fromJson(item.data()));
@@ -83,7 +85,7 @@ class _TeacherHomeState extends State<TeacherHome> {
         quizzes = list;
         _isLoding = false;
       });
-    } on Exception catch(e){
+    } on Exception catch (e) {
       setState(() {
         _isLoding = false;
       });
@@ -102,14 +104,18 @@ class _TeacherHomeState extends State<TeacherHome> {
     await FirebaseFirestore.instance
         .collection("Quizzes")
         .doc(reference)
-        .delete().then((value) async {
+        .delete()
+        .then((value) async {
       var queSnap = await FirebaseFirestore.instance
           .collection("Questions")
-          .where('QuizId',isEqualTo: reference).get();
+          .where('QuizId', isEqualTo: reference)
+          .get();
       for (var item in queSnap.docs) {
         var que = Question.fromJson(item.data());
         await FirebaseFirestore.instance
-            .collection("Questions").doc(que.id).delete();
+            .collection("Questions")
+            .doc(que.id)
+            .delete();
       }
     });
     var snap = await FirebaseFirestore.instance.collection("Quizzes").get();
@@ -148,118 +154,115 @@ class _TeacherHomeState extends State<TeacherHome> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.amber,
-          title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children:[
-            const Text('Quizzes List'),
-            SizedBox(),
-            InkWell(
-              child: Center(
-                child: Text(
-                  "Logout",
-                  style: TextStyle(fontSize: 16.0, color: Colors.white),
-                ),
-              ),
-              onTap: () async {
-                setState(() {
-                  // FirebaseAuth.instance.signOut();
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => (Login())));
-                });
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                prefs.setString(UserData.role.toString().split('.').last, "LoggedOut");
-              },
-            ),
-          ])
-        ),
-        body: _isLoding == false
-            ?SmartRefresher(
-          enablePullDown: true,
-          enablePullUp: false,
-          header: WaterDropHeader(),
-          footer: CustomFooter(
-            builder: (BuildContext context,LoadStatus mode){
-              Widget body ;
-              if(mode==LoadStatus.idle){
-                body =  Text("pull up load");
-              }
-              else if(mode==LoadStatus.loading){
-                body =  CupertinoActivityIndicator();
-              }
-              else if(mode == LoadStatus.failed){
-                body = Text("Load Failed!Click retry!");
-              }
-              else if(mode == LoadStatus.canLoading){
-                body = Text("release to load more");
-              }
-              else{
-                body = Text("No more Data");
-              }
-              return Container(
-                height: 55.0,
-                child: Center(child:body),
-              );
-            },
-          ),
-          controller: _refreshController,
-          onRefresh: _onRefresh,
-          onLoading: _onLoading,
-          child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: quizzes == null ? 0 : quizzes.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Dismissible(
-                  // Show a red background as the item is swiped away.
-                  background: Container(color: Colors.red),
-                  key: UniqueKey(),
-                  onDismissed: (direction) {
-                    setState(() {
-                      // items.removeAt(index);
-                      DeleteQuiz(quizzes[index].Id);
-                    });
-                  },
-                  child: Card(
-                    child: ListTile(
-                      title: FlatButton(
-                        color: counter_for_Quiz_number % 2 == 0
-                            ? Colors.amber
-                            : Colors.white12, //color: Colors.white,
-                        splashColor: Colors.white,
-                        onPressed: () {
-                          setState(() {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => (ViewQuiz(
-                                        quizzes[index]))));
-                          });
-                        },
-                        child: Center(
-                          child: Text(
-                            quizzes[index].Title,
-                            style: TextStyle(
-                                fontSize: 20.0, color: Colors.black54),
-                          ),
-                        ),
+            backgroundColor: Colors.amber,
+            title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Quizzes List'),
+                  SizedBox(),
+                  InkWell(
+                    child: Center(
+                      child: Text(
+                        "Logout",
+                        style: TextStyle(fontSize: 16.0, color: Colors.white),
                       ),
                     ),
+                    onTap: () async {
+                      setState(() {
+                        // FirebaseAuth.instance.signOut();
+                        Navigator.pushReplacement(context,
+                            MaterialPageRoute(builder: (context) => (Login())));
+                      });
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      prefs.setString(UserData.role.toString().split('.').last,
+                          "LoggedOut");
+                    },
                   ),
-                );
-              }),
-        )
+                ])),
+        body: _isLoding == false
+            ? SmartRefresher(
+                enablePullDown: true,
+                enablePullUp: false,
+                header: WaterDropHeader(),
+                footer: CustomFooter(
+                  builder: (BuildContext context, LoadStatus mode) {
+                    Widget body;
+                    if (mode == LoadStatus.idle) {
+                      body = Text("pull up load");
+                    } else if (mode == LoadStatus.loading) {
+                      body = CupertinoActivityIndicator();
+                    } else if (mode == LoadStatus.failed) {
+                      body = Text("Load Failed!Click retry!");
+                    } else if (mode == LoadStatus.canLoading) {
+                      body = Text("release to load more");
+                    } else {
+                      body = Text("No more Data");
+                    }
+                    return Container(
+                      height: 55.0,
+                      child: Center(child: body),
+                    );
+                  },
+                ),
+                controller: _refreshController,
+                onRefresh: _onRefresh,
+                onLoading: _onLoading,
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: quizzes == null ? 0 : quizzes.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Dismissible(
+                        // Show a red background as the item is swiped away.
+                        background: Container(color: Colors.red),
+                        key: UniqueKey(),
+                        onDismissed: (direction) {
+                          setState(() {
+                            // items.removeAt(index);
+                            DeleteQuiz(quizzes[index].Id);
+                          });
+                        },
+                        child: Card(
+                          child: ListTile(
+                            title: FlatButton(
+                              color: counter_for_Quiz_number % 2 == 0
+                                  ? Colors.amber
+                                  : Colors.white12, //color: Colors.white,
+                              splashColor: Colors.white,
+                              onPressed: () {
+                                setState(() {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              (ViewQuiz(quizzes[index]))));
+                                });
+                              },
+                              child: Center(
+                                child: Text(
+                                  quizzes[index].Title,
+                                  style: TextStyle(
+                                      fontSize: 20.0, color: Colors.black54),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+              )
             : Center(
                 child: CircularProgressIndicator(
                   backgroundColor: Colors.amber,
-                  valueColor:
-                  new AlwaysStoppedAnimation<Color>(Colors.white54),
+                  valueColor: new AlwaysStoppedAnimation<Color>(Colors.white54),
                 ),
               ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () async{
+          onPressed: () async {
             var connectivityResult = await (Connectivity().checkConnectivity());
             if (connectivityResult == ConnectivityResult.none) {
-              Fluttertoast.showToast(msg: 'Please connect to an internet connection!');
+              Fluttertoast.showToast(
+                  msg: 'Please connect to an internet connection!');
               return;
             }
             Navigator.push(
