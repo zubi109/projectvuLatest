@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:projectvu/Authentication/Login.dart';
+import 'package:projectvu/admin/admin_unverified_account.dart';
 import 'package:projectvu/models/User.dart';
 
 class signup extends StatefulWidget {
@@ -71,32 +72,25 @@ class _signupState extends State<signup> {
       });
     } on PlatformException catch (e) {
       if (e.code == 'firebase_auth') {
-        if (e.details['code'] == '"code" -> "weak-password"') {
-          Fluttertoast.showToast(msg: 'The password provided is too weak.');
-          setState(() {
-            isLoading = false;
-          });
-        } else if (e.details['code'] == 'email-already-in-use') {
-          Fluttertoast.showToast(
-              msg: 'The account already exists for that email.');
-          setState(() {
-            isLoading = false;
-          });
+        if(e.details['code'] == '"code" -> "weak-password"'){
+          Fluttertoast.showToast(msg:'The password provided is too weak.');
         }
+        else if (e.details['code'] == 'email-already-in-use') {
+          Fluttertoast.showToast(msg:'The account already exists for that email.');
+        }
+        setState(() {
+          isLoading = false;
+        });
       }
-    } on FirebaseAuthException catch (e) {
+    }on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        Fluttertoast.showToast(msg: 'The password provided is too weak.');
-        setState(() {
-          isLoading = false;
-        });
+        Fluttertoast.showToast(msg:'The password provided is too weak.');
       } else if (e.code == 'email-already-in-use') {
-        Fluttertoast.showToast(
-            msg: 'The account already exists for that email.');
-        setState(() {
-          isLoading = false;
-        });
+        Fluttertoast.showToast(msg:'The account already exists for that email.');
       }
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -133,24 +127,27 @@ class _signupState extends State<signup> {
           height: 110,
           width: 110,
           decoration: BoxDecoration(
-            color: Colors.amber,
+            color: Colors.amber
+            ,
             //border: Border.all(width: 1, color: Colors.black),
             borderRadius: BorderRadius.circular(120),
           ),
           child: Center(
+
             child: Text(
               'Signup',
               style: TextStyle(
-                fontSize: 32.0,
+                fontSize:32.0,
                 fontWeight: FontWeight.bold,
                 color: Colors.white.withOpacity(1.0),
               ),
             ),
           ),
         ),
-        SizedBox(height: 20), // logo title
+        SizedBox(height: 20),// logo title
         Theme(
-          data: Theme.of(context).copyWith(primaryColor: Colors.amber),
+          data: Theme.of(context)
+              .copyWith(primaryColor: Colors.amber),
           child: TextField(
             decoration: InputDecoration(
               enabledBorder: UnderlineInputBorder(
@@ -167,9 +164,10 @@ class _signupState extends State<signup> {
             controller: _fullnameController,
           ),
         ), //name
-        SizedBox(height: 20), // logo title
+        SizedBox(height: 20),// logo title
         Theme(
-          data: Theme.of(context).copyWith(primaryColor: Colors.amber),
+          data: Theme.of(context)
+              .copyWith(primaryColor: Colors.amber),
           child: TextField(
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
@@ -186,9 +184,10 @@ class _signupState extends State<signup> {
             controller: _emailController,
           ),
         ), //email
-        SizedBox(height: 20), // logo title
+        SizedBox(height: 20),// logo title
         Theme(
-          data: Theme.of(context).copyWith(primaryColor: Colors.amber),
+          data: Theme.of(context)
+              .copyWith(primaryColor: Colors.amber),
           child: TextField(
             cursorColor: Colors.blueAccent,
             decoration: InputDecoration(
@@ -223,9 +222,10 @@ class _signupState extends State<signup> {
             controller: _passwordController,
           ),
         ), //password
-        SizedBox(height: 20), // logo title
+        SizedBox(height: 20),// logo title
         Theme(
-          data: Theme.of(context).copyWith(primaryColor: Colors.amber),
+          data: Theme.of(context)
+              .copyWith(primaryColor: Colors.amber),
           child: TextField(
             cursorColor: Colors.blueAccent,
             decoration: InputDecoration(
@@ -265,62 +265,58 @@ class _signupState extends State<signup> {
         Row(children: [
           Expanded(
               child: Container(
-            color: Colors.amber,
-            height: 50,
-            child: ElevatedButton(
-                // primary: Colors.amber, // background
-                onPressed: () {
-                  if (_fullnameController.text.isEmpty &&
-                      _emailController.text.isEmpty &&
-                      _passwordController.text.isEmpty &&
-                      _confPassController.text.isEmpty)
-                    return Fluttertoast.showToast(msg: "All fields Empty ");
-                  else if (_fullnameController.text.isEmpty)
-                    return Fluttertoast.showToast(
-                        msg: "Please Enter Your name");
-                  else if (!RegExp(
+                color: Colors.amber,
+                height: 50,
+                child: ElevatedButton(
+                  // primary: Colors.amber, // background
+                    onPressed: () {
+                      if (_fullnameController.text.isEmpty &&
+                          _emailController.text.isEmpty &&
+                          _passwordController.text.isEmpty &&
+                          _confPassController.text.isEmpty)
+                        return Fluttertoast.showToast(msg: "All fields Empty ");
+                      else if (_fullnameController.text.isEmpty)
+                        return Fluttertoast.showToast(msg: "Please Enter Your name");
+                      else if (!RegExp(
                           r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                      .hasMatch(_emailController.text))
-                    return Fluttertoast.showToast(
-                        msg: ' NOT valid email Format');
-                  else if (_emailController.text.isEmpty)
-                    return Fluttertoast.showToast(msg: "Please Enter Email");
-                  else if (_passwordController.text.isEmpty)
-                    return Fluttertoast.showToast(msg: "Please Enter Password");
-                  else if (_confPassController.text.isEmpty)
-                    return Fluttertoast.showToast(
-                        msg: "Please Enter confirm Password");
-                  else if (_passwordController.text != _confPassController.text)
-                    return Fluttertoast.showToast(
-                        msg: "Confirm Password not match");
-                  else {
-                    authenticationsignup();
-                  }
-                },
-                child: !isLoading
-                    ? Text(
-                        "Signup",
-                        style: TextStyle(fontSize: 22),
-                      )
-                    : CircularProgressIndicator(
-                        backgroundColor: Colors.white,
-                        valueColor:
-                            new AlwaysStoppedAnimation<Color>(Colors.amber),
-                      ),
-                style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.amber)
-                    // style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                    //       (Set<MaterialState> states) {
-                    //     if (states.contains(MaterialState.pressed))
-                    //       return Colors.amber;
-                    //     return null; // Use the component's default.
-                    //   },
-                    // )),
-                    )),
-          ))
-        ]), // logo title
-        SizedBox(height: 20), // logo title
+                          .hasMatch(_emailController.text))
+                        return Fluttertoast.showToast(msg: ' NOT valid email Format');
+                      else if (_emailController.text.isEmpty)
+                        return Fluttertoast.showToast(msg: "Please Enter Email");
+                      else if (_passwordController.text.isEmpty)
+                        return Fluttertoast.showToast(msg: "Please Enter Password");
+                      else if (_confPassController.text.isEmpty)
+                        return Fluttertoast.showToast(
+                            msg: "Please Enter confirm Password");
+                      else if (_passwordController.text != _confPassController.text)
+                        return Fluttertoast.showToast(msg: "Confirm Password not match");
+                      else {
+                        authenticationsignup();
+                      }
+                    },
+                    child: !isLoading
+                        ?Text(
+                      "Signup",
+                      style: TextStyle(fontSize: 22),
+                    )
+                        :CircularProgressIndicator(
+                      backgroundColor: Colors.white,
+                      valueColor:
+                      new AlwaysStoppedAnimation<Color>(Colors.amber),
+                    ),
+                    style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.amber)
+                      // style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                      //       (Set<MaterialState> states) {
+                      //     if (states.contains(MaterialState.pressed))
+                      //       return Colors.amber;
+                      //     return null; // Use the component's default.
+                      //   },
+                      // )),
+                    )
+                ),
+              ))
+        ]),// logo title
+        SizedBox(height: 20),// logo title
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

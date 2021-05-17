@@ -102,29 +102,29 @@ class _LoginState extends State<Login> {
       if (e.code == 'firebase_auth') {
         if(e.details['code'] == '"code" -> "user-not-found"'){
           Fluttertoast.showToast(msg:'No user found for that email.');
-          setState(() {
-            isLoading = false;
-          });
         }
         else if (e.details['code'] == 'wrong-password') {
           Fluttertoast.showToast(msg:'Wrong password provided for that user.');
-          setState(() {
-            isLoading = false;
-          });
         }
+        else if(e.details['code'] == 'invalid-email'){
+          Fluttertoast.showToast(msg:e.details['message']);
+        }
+        setState(() {
+          isLoading = false;
+        });
       }
     }on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         Fluttertoast.showToast(msg:'No user found for that email.');
-        setState(() {
-          isLoading = false;
-        });
       } else if (e.code == 'wrong-password') {
         Fluttertoast.showToast(msg:'Wrong password provided for that user.');
-        setState(() {
-          isLoading = false;
-        });
       }
+      else if(e.code == 'invalid-email'){
+        Fluttertoast.showToast(msg:e.message);
+      }
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
