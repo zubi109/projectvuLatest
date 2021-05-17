@@ -74,29 +74,23 @@ class _signupState extends State<signup> {
       if (e.code == 'firebase_auth') {
         if(e.details['code'] == '"code" -> "weak-password"'){
           Fluttertoast.showToast(msg:'The password provided is too weak.');
-          setState(() {
-            isLoading = false;
-          });
         }
         else if (e.details['code'] == 'email-already-in-use') {
           Fluttertoast.showToast(msg:'The account already exists for that email.');
-          setState(() {
-            isLoading = false;
-          });
         }
+        setState(() {
+          isLoading = false;
+        });
       }
     }on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         Fluttertoast.showToast(msg:'The password provided is too weak.');
-        setState(() {
-          isLoading = false;
-        });
       } else if (e.code == 'email-already-in-use') {
         Fluttertoast.showToast(msg:'The account already exists for that email.');
-        setState(() {
-          isLoading = false;
-        });
       }
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
