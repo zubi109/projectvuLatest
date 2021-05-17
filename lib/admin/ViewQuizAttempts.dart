@@ -68,7 +68,6 @@ class _ViewQuizAttemptsState extends State<ViewQuizAttempts> {
       var snap = await FirebaseFirestore.instance
           .collection("Attempts")
           .where("QuizId", isEqualTo: widget.quiz.Id)
-          .orderBy('CreatedAt',descending: true)
           .get();
       List<Attempt> list = [];
       for (var item in snap.docs) {

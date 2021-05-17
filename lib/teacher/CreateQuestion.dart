@@ -218,19 +218,8 @@ setState(() {
                                 // primary: Colors.amber, // background
                                   onPressed: () {
                                     if (_formKey.currentState.validate()) {
-                                      if(quesiontype != QuestionType.MCQ.toString().split('.').last){
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                          content: Text('Adding Question...'),
-                                          backgroundColor: Colors.amber,
-                                        ));
-                                        nextQuestion();
-                                      }
-                                      else{
-                                        if(newQuestion.answer == _option1Controller.text ||
-                                            newQuestion.answer == _option2Controller.text ||
-                                            newQuestion.answer == _option3Controller.text ||
-                                            newQuestion.answer == _option4Controller.text){
+                                      if(quesiontype != null){
+                                        if(quesiontype != QuestionType.MCQ.toString().split('.').last){
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
                                             content: Text('Adding Question...'),
@@ -239,11 +228,30 @@ setState(() {
                                           nextQuestion();
                                         }
                                         else{
-                                          Fluttertoast.showToast(
-                                            msg: "Please select answer from available 4 options!",
-                                            backgroundColor: Colors.red
-                                          );
+                                          if(newQuestion.answer == _option1Controller.text ||
+                                              newQuestion.answer == _option2Controller.text ||
+                                              newQuestion.answer == _option3Controller.text ||
+                                              newQuestion.answer == _option4Controller.text){
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                              content: Text('Adding Question...'),
+                                              backgroundColor: Colors.amber,
+                                            ));
+                                            nextQuestion();
+                                          }
+                                          else{
+                                            Fluttertoast.showToast(
+                                                msg: "Please select answer from available 4 options!",
+                                                backgroundColor: Colors.red
+                                            );
+                                          }
                                         }
+                                      }
+                                      else{
+                                        Fluttertoast.showToast(
+                                            msg: "Please select question type from available options!",
+                                            backgroundColor: Colors.red
+                                        );
                                       }
                                     }
 
@@ -266,19 +274,8 @@ setState(() {
                                 // primary: Colors.amber, // background
                                   onPressed: () {
                                     if (_formKey.currentState.validate()) {
-                                      if(quesiontype != QuestionType.MCQ.toString().split('.').last){
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                          content: Text('Creating Quiz...'),
-                                          backgroundColor: Colors.amber,
-                                        ));
-                                        finishQuiz();
-                                      }
-                                      else{
-                                        if(newQuestion.answer == _option1Controller.text ||
-                                            newQuestion.answer == _option2Controller.text ||
-                                            newQuestion.answer == _option3Controller.text ||
-                                            newQuestion.answer == _option4Controller.text){
+                                      if(quesiontype != null){
+                                        if(quesiontype != QuestionType.MCQ.toString().split('.').last){
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
                                             content: Text('Creating Quiz...'),
@@ -287,11 +284,30 @@ setState(() {
                                           finishQuiz();
                                         }
                                         else{
-                                          Fluttertoast.showToast(
-                                              msg: "Please select answer from available 4 options!",
-                                              backgroundColor: Colors.red
-                                          );
+                                          if(newQuestion.answer == _option1Controller.text ||
+                                              newQuestion.answer == _option2Controller.text ||
+                                              newQuestion.answer == _option3Controller.text ||
+                                              newQuestion.answer == _option4Controller.text){
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                              content: Text('Creating Quiz...'),
+                                              backgroundColor: Colors.amber,
+                                            ));
+                                            finishQuiz();
+                                          }
+                                          else{
+                                            Fluttertoast.showToast(
+                                                msg: "Please select answer from available 4 options!",
+                                                backgroundColor: Colors.red
+                                            );
+                                          }
                                         }
+                                      }
+                                      else{
+                                        Fluttertoast.showToast(
+                                            msg: "Please select question type from available options!",
+                                            backgroundColor: Colors.red
+                                        );
                                       }
                                     }
                                   },
